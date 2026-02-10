@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MoodCraft</title>
+    <link rel="stylesheet" href="app.css"> <!-- Исправлен путь к CSS -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="theme-color" content="#6366f1">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">✨</div>
+                    <h1>MoodCraft</h1>
+                </div>
+                <div class="streak-badge" id="streak-badge">
+                    <i class="fas fa-fire"></i>
+                    <span id="streak-count">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-content" id="app-content">
+            <!-- Приветствие - только на главной -->
+            <section class="welcome-card" id="welcome-card">
+                <div class="welcome-text">
+                    <h2 id="greeting">Привет!</h2>
+                    <p id="current-date">Загружаем...</p>
+                </div>
+            </section>
+
+            <!-- Настроение -->
+            <section class="mood-section hidden" id="mood-section"> <!-- Добавлен класс hidden -->
+                <h3 class="section-title">Как ты сегодня?</h3>
+                <div class="mood-grid">
+                    <button class="mood-btn" data-mood="1">
+                        <span class="mood-emoji">😢</span>
+                        <span class="mood-label">Плохо</span>
+                    </button>
+                    <button class="mood-btn" data-mood="2">
+                        <span class="mood-emoji">😔</span>
+                        <span class="mood-label">Не очень</span>
+                    </button>
+                    <button class="mood-btn" data-mood="3">
+                        <span class="mood-emoji">😐</span>
+                        <span class="mood-label">Нормально</span>
+                    </button>
+                    <button class="mood-btn active" data-mood="4">
+                        <span class="mood-emoji">🙂</span>
+                        <span class="mood-label">Хорошо</span>
+                    </button>
+                    <button class="mood-btn" data-mood="5">
+                        <span class="mood-emoji">😊</span>
+                        <span class="mood-label">Отлично!</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Привычки -->
+            <section class="habits-section hidden" id="habits-section"> <!-- Добавлен класс hidden -->
+                <div class="section-header">
+                    <h3 class="section-title">Привычки</h3>
+                    <span class="habits-counter" id="habits-counter">0/0</span>
+                </div>
+                
+                <div class="habits-list" id="habits-list">
+                    <!-- Привычки загрузятся через JS -->
+                </div>
+                
+                <button class="add-btn" id="add-habit-btn">
+                    <i class="fas fa-plus"></i>
+                    Новая привычка
+                </button>
+            </section>
+
+            <!-- Дневник -->
+            <section class="diary-section hidden" id="diary-section"> <!-- Добавлен класс hidden -->
+                <h3 class="section-title">Дневник</h3>
+                
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <button class="nav-btn" id="prev-week">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="month-title" id="month-title"></div>
+                        <button class="nav-btn" id="next-week">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="week-days">
+                        <div>Пн</div>
+                        <div>Вт</div>
+                        <div>Ср</div>
+                        <div>Чт</div>
+                        <div>Пт</div>
+                        <div>Сб</div>
+                        <div>Вс</div>
+                    </div>
+                    
+                    <div class="week-dates" id="week-dates">
+                        <!-- Дни недели загрузятся через JS -->
+                    </div>
+                </div>
+                
+                <div class="notes-search">
+                    <input type="text" id="search-notes" placeholder="Поиск заметок..." class="search-input">
+                </div>
+                
+                <div class="notes-list" id="notes-list">
+                    <!-- Заметки загрузятся через JS -->
+                </div>
+            </section>
+
+            <!-- Статистика -->
+            <section class="stats-section hidden" id="stats-section"> <!-- Добавлен класс hidden -->
+                <h3 class="section-title">Статистика</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-streak">0</div>
+                        <div class="stat-label">Дней подряд</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-completed">0</div>
+                        <div class="stat-label">Выполнено</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Всего привычек</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Нижняя навигация -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="habits">
+                <i class="fas fa-tasks"></i>
+                <span>Привычки</span>
+            </button>
+            <button class="nav-btn" data-page="diary">
+                <i class="fas fa-book"></i>
+                <span>Дневник</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="habit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Новая привычка</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="habit-input" placeholder="Название привычки" maxlength="30" class="modal-input">
+                <div class="modal-actions">
+                    <button class="btn secondary" id="cancel-btn">Отмена</button>
+                    <button class="btn primary" id="save-btn">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="note-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="note-title">Новая заметка</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="note-input" placeholder="Опишите свой день..." maxlength="1000" class="modal-textarea"></textarea>
+                <div class="char-count" id="char-count">0/1000</div>
+                <div class="modal-actions">
+                    <button class="btn secondary" id="note-cancel-btn">Отмена</button>
+                    <button class="btn primary" id="note-save-btn">✓</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script> <!-- Исправлен путь к JS -->
+</body>
+</html>
