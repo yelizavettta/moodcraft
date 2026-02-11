@@ -449,6 +449,106 @@ body {
     color: #64748b;
 }
 
+/* ===== ПРАКТИКИ (НОВАЯ СЕКЦИЯ) ===== */
+.practice-section {
+    padding: 0 0 16px;
+}
+
+.practice-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: white;
+    padding: 8px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.videos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.video-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.video-thumbnail {
+    width: 100px;
+    height: 70px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+    font-size: 24px;
+}
+
+.video-info {
+    flex: 1;
+}
+
+.video-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.video-duration {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.video-link {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: #6366f1;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: opacity 0.2s;
+}
+
+.video-link:active {
+    opacity: 0.8;
+}
+
 /* Нижняя навигация */
 .bottom-nav {
     position: fixed;
@@ -646,6 +746,16 @@ body {
     
     .stat-value {
         font-size: 20px;
+    }
+
+    .video-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .video-thumbnail {
+        width: 100%;
+        height: 120px;
     }
 }
 
