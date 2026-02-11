@@ -89,8 +89,8 @@ function setupGreeting() {
     }
     
     // Устанавливаем приветствие
-    elements.greeting.textContent = `Привет, ${userName}!`;
-    elements.currentDate.textContent = now.toLocaleDateString('ru-RU', dateOptions);
+    if (elements.greeting) elements.greeting.textContent = `Привет, ${userName}!`;
+    if (elements.currentDate) elements.currentDate.textContent = now.toLocaleDateString('ru-RU', dateOptions);
 }
 
 // Настройка обработчиков событий
@@ -119,21 +119,25 @@ function setupEventListeners() {
     });
     
     // Кнопка добавления привычки
-    elements.addHabitBtn.addEventListener('click', () => {
-        showModal('habit-modal');
-        elements.habitInput.focus();
-    });
+    if (elements.addHabitBtn) {
+        elements.addHabitBtn.addEventListener('click', () => {
+            showModal('habit-modal');
+            elements.habitInput?.focus();
+        });
+    }
     
     // Навигация календаря
-    elements.prevWeekBtn.addEventListener('click', () => {
-        state.currentWeek--;
-        renderCalendar();
-    });
-    
-    elements.nextWeekBtn.addEventListener('click', () => {
-        state.currentWeek++;
-        renderCalendar();
-    });
+    if (elements.prevWeekBtn && elements.nextWeekBtn) {
+        elements.prevWeekBtn.addEventListener('click', () => {
+            state.currentWeek--;
+            renderCalendar();
+        });
+        
+        elements.nextWeekBtn.addEventListener('click', () => {
+            state.currentWeek++;
+            renderCalendar();
+        });
+    }
     
     // Поиск заметок
     elements.searchNotes?.addEventListener('input', renderNotes);
@@ -147,12 +151,12 @@ function setupModalControls() {
     document.querySelectorAll('.close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
-            elements.habitInput.value = '';
+            if (elements.habitInput) elements.habitInput.value = '';
         });
     });
     
-    document.getElementById('save-btn').addEventListener('click', saveHabit);
-    elements.habitInput.addEventListener('keypress', (e) => {
+    document.getElementById('save-btn')?.addEventListener('click', saveHabit);
+    elements.habitInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') saveHabit();
     });
     
@@ -160,14 +164,14 @@ function setupModalControls() {
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
-            elements.noteInput.value = '';
+            if (elements.noteInput) elements.noteInput.value = '';
             state.editingNoteId = null;
         });
     });
     
-    document.getElementById('note-save-btn').addEventListener('click', saveNote);
-    elements.noteInput.addEventListener('input', (e) => {
-        elements.charCount.textContent = `${e.target.value.length}/1000`;
+    document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
+    elements.noteInput?.addEventListener('input', (e) => {
+        if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
     
     // Закрытие модальных окон по клику на фон
@@ -183,27 +187,24 @@ function switchPage(page) {
     state.currentPage = page;
     
     // Скрываем все секции
-    elements.welcomeCard.classList.add('hidden');
-    elements.moodSection.classList.add('hidden');
-    elements.habitsSection.classList.add('hidden');
-    elements.diarySection.classList.add('hidden');
-    elements.statsSection.classList.add('hidden');
+    if (elements.welcomeCard) elements.welcomeCard.classList.add('hidden');
+    if (elements.moodSection) elements.moodSection.classList.add('hidden');
+    if (elements.habitsSection) elements.habitsSection.classList.add('hidden');
+    if (elements.diarySection) elements.diarySection.classList.add('hidden');
+    if (elements.statsSection) elements.statsSection.classList.add('hidden');
     
     // Показываем нужные секции для текущей страницы
     if (page === 'home') {
-        // На главной: приветствие + настроение + привычки + статистика
-        elements.welcomeCard.classList.remove('hidden');
-        elements.moodSection.classList.remove('hidden');
-        elements.habitsSection.classList.remove('hidden');
-        elements.statsSection.classList.remove('hidden');
+        elements.welcomeCard?.classList.remove('hidden');
+        elements.moodSection?.classList.remove('hidden');
+        elements.habitsSection?.classList.remove('hidden');
+        elements.statsSection?.classList.remove('hidden');
     } else if (page === 'diary') {
-        // В дневнике: только календарь и заметки
-        elements.diarySection.classList.remove('hidden');
+        elements.diarySection?.classList.remove('hidden');
         renderCalendar();
         renderNotes();
     } else if (page === 'habits') {
-        // На странице привычек: только привычки
-        elements.habitsSection.classList.remove('hidden');
+        elements.habitsSection?.classList.remove('hidden');
     }
 }
 
@@ -216,7 +217,7 @@ function setMood(mood) {
 
 // Сохранение привычки
 function saveHabit() {
-    const title = elements.habitInput.value.trim();
+    const title = elements.habitInput?.value.trim();
     if (!title) {
         showToast('Введите название привычки');
         return;
@@ -232,7 +233,7 @@ function saveHabit() {
     
     state.habits.push(newHabit);
     hideModal('habit-modal');
-    elements.habitInput.value = '';
+    if (elements.habitInput) elements.habitInput.value = '';
     saveData();
     render();
     showToast('Привычка добавлена');
@@ -269,72 +270,91 @@ function deleteHabit(id) {
 
 // Рендер календаря
 function renderCalendar() {
-    const today = new Date();
-    const currentDate = new Date();
-    currentDate.setDate(today.getDate() + (state.currentWeek * 7));
-    
-    // Обновляем заголовок месяца
-    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
-                       'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-    
-    // Находим понедельник текущей недели
-    const monday = new Date(currentDate);
-    const day = monday.getDay();
-    const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
-    monday.setDate(diff);
-    
-    // Очищаем предыдущие дни
-    elements.weekDates.innerHTML = '';
-    
-    const weekDays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
-    
-    // Рендерим 7 дней недели
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(monday);
-        date.setDate(monday.getDate() + i);
-        
-        const btn = document.createElement('button');
-        btn.className = 'date-btn';
-        btn.innerHTML = `
-            <div>${date.getDate()}</div>
-            <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
-        `;
-        
-        // Проверяем, сегодня ли это
-        if (isSameDay(date, today)) {
-            btn.classList.add('today');
+    try {
+        // Проверяем, что нужные элементы существуют
+        if (!elements.weekDates || !elements.monthTitle) {
+            console.error('Calendar elements not found');
+            return;
         }
+
+        const today = new Date();
+        const currentDate = new Date();
+        currentDate.setDate(today.getDate() + (state.currentWeek * 7));
         
-        // Проверяем, выбран ли этот день
-        if (isSameDay(date, state.selectedDate)) {
-            btn.classList.add('selected');
+        // Обновляем заголовок месяца
+        const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                           'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        
+        // Находим понедельник текущей недели
+        const monday = new Date(currentDate);
+        const day = monday.getDay();
+        const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
+        monday.setDate(diff);
+        
+        // Очищаем предыдущие дни
+        elements.weekDates.innerHTML = '';
+        
+        const weekDays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+        
+        // Рендерим 7 дней недели
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(monday);
+            date.setDate(monday.getDate() + i);
+            
+            const btn = document.createElement('button');
+            btn.className = 'date-btn';
+            btn.innerHTML = `
+                <div>${date.getDate()}</div>
+                <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
+            `;
+            
+            // Проверяем, сегодня ли это
+            if (isSameDay(date, today)) {
+                btn.classList.add('today');
+            }
+            
+            // Проверяем, выбран ли этот день
+            if (state.selectedDate && isSameDay(date, state.selectedDate)) {
+                btn.classList.add('selected');
+            }
+            
+            // Проверяем, есть ли заметка на этот день
+            const hasNote = state.notes.some(note => {
+                try {
+                    return isSameDay(new Date(note.date), date);
+                } catch (e) {
+                    return false;
+                }
+            });
+            if (hasNote) {
+                btn.classList.add('has-note');
+            }
+            
+            // Проверяем, другой ли это месяц
+            if (date.getMonth() !== currentDate.getMonth()) {
+                btn.classList.add('other-month');
+            }
+            
+            // Используем замыкание для правильной привязки date
+            btn.addEventListener('click', (function(selectedDate) {
+                return function() {
+                    state.selectedDate = selectedDate;
+                    renderCalendar(); // Перерисовываем для обновления выделения
+                    openNoteModal();
+                };
+            })(new Date(date))); // Передаем копию даты
+            
+            elements.weekDates.appendChild(btn);
         }
-        
-        // Проверяем, есть ли заметка на этот день
-        const hasNote = state.notes.some(note => isSameDay(new Date(note.date), date));
-        if (hasNote) {
-            btn.classList.add('has-note');
-        }
-        
-        // Проверяем, другой ли это месяц
-        if (date.getMonth() !== currentDate.getMonth()) {
-            btn.classList.add('other-month');
-        }
-        
-        // Обработчик клика на день
-        btn.addEventListener('click', () => {
-            state.selectedDate = date;
-            renderCalendar(); // Перерисовываем для обновления выделения
-            openNoteModal();
-        });
-        
-        elements.weekDates.appendChild(btn);
+    } catch (error) {
+        console.error('Error in renderCalendar:', error);
     }
 }
 
 // Проверка, один ли это день
 function isSameDay(date1, date2) {
+    if (!date1 || !date2) return false;
     return date1.getDate() === date2.getDate() &&
            date1.getMonth() === date2.getMonth() &&
            date1.getFullYear() === date2.getFullYear();
@@ -342,6 +362,8 @@ function isSameDay(date1, date2) {
 
 // Рендер заметок
 function renderNotes() {
+    if (!elements.notesList) return;
+    
     const searchQuery = elements.searchNotes?.value.toLowerCase() || '';
     
     // Фильтруем и сортируем заметки
@@ -398,20 +420,22 @@ function renderNotes() {
 
 // Открытие модального окна заметки
 function openNoteModal(note = null) {
-    elements.noteInput.value = note ? note.text : '';
-    elements.charCount.textContent = `${elements.noteInput.value.length}/1000`;
+    if (elements.noteInput) elements.noteInput.value = note ? note.text : '';
+    if (elements.charCount) elements.charCount.textContent = `${elements.noteInput?.value.length || 0}/1000`;
     
     // Обновляем заголовок
-    document.getElementById('note-title').textContent = 
-        note ? 'Редактировать заметку' : 'Новая заметка';
+    const noteTitle = document.getElementById('note-title');
+    if (noteTitle) {
+        noteTitle.textContent = note ? 'Редактировать заметку' : 'Новая заметка';
+    }
     
     showModal('note-modal');
-    elements.noteInput.focus();
+    elements.noteInput?.focus();
 }
 
 // Сохранение заметки
 function saveNote() {
-    const text = elements.noteInput.value.trim();
+    const text = elements.noteInput?.value.trim();
     if (!text) {
         showToast('Введите текст заметки');
         return;
@@ -437,7 +461,7 @@ function saveNote() {
     }
     
     hideModal('note-modal');
-    elements.noteInput.value = '';
+    if (elements.noteInput) elements.noteInput.value = '';
     state.editingNoteId = null;
     saveData();
     renderCalendar();
@@ -452,6 +476,8 @@ function render() {
 }
 
 function renderHabits() {
+    if (!elements.habitsList || !elements.habitsCounter) return;
+    
     if (state.habits.length === 0) {
         elements.habitsList.innerHTML = `
             <div class="empty-state">
@@ -499,19 +525,21 @@ function updateStats() {
     }
     
     // Обновляем UI
-    elements.streakCount.textContent = state.streak;
-    elements.statStreak.textContent = state.streak;
-    elements.statCompleted.textContent = completed;
-    elements.statTotal.textContent = total;
+    if (elements.streakCount) elements.streakCount.textContent = state.streak;
+    if (elements.statStreak) elements.statStreak.textContent = state.streak;
+    if (elements.statCompleted) elements.statCompleted.textContent = completed;
+    if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
 // Вспомогательные функции
 function showModal(modalId) {
-    document.getElementById(modalId).classList.add('active');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('active');
 }
 
 function hideModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove('active');
 }
 
 function showToast(message) {
@@ -533,11 +561,24 @@ function showToast(message) {
         border-radius: 10px;
         font-size: 14px;
         z-index: 1000;
+        animation: fadeInOut 2s ease;
     `;
     
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
 }
+
+// Добавляем анимацию для toast
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+`;
+document.head.appendChild(style);
 
 // Сохранение и загрузка данных
 function saveData() {
