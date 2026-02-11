@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MoodCraft</title>
-    <link rel="stylesheet" href="app.css"> <!-- Исправлен путь к CSS -->
+    <link rel="stylesheet" href="app.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="theme-color" content="#6366f1">
@@ -34,7 +34,7 @@
             </section>
 
             <!-- Настроение -->
-            <section class="mood-section hidden" id="mood-section"> <!-- Добавлен класс hidden -->
+            <section class="mood-section hidden" id="mood-section">
                 <h3 class="section-title">Как ты сегодня?</h3>
                 <div class="mood-grid">
                     <button class="mood-btn" data-mood="1">
@@ -60,8 +60,8 @@
                 </div>
             </section>
 
-            <!-- Привычки -->
-            <section class="habits-section hidden" id="habits-section"> <!-- Добавлен класс hidden -->
+            <!-- Привычки (остаются на главной) -->
+            <section class="habits-section hidden" id="habits-section">
                 <div class="section-header">
                     <h3 class="section-title">Привычки</h3>
                     <span class="habits-counter" id="habits-counter">0/0</span>
@@ -78,7 +78,7 @@
             </section>
 
             <!-- Дневник -->
-            <section class="diary-section hidden" id="diary-section"> <!-- Добавлен класс hidden -->
+            <section class="diary-section hidden" id="diary-section">
                 <h3 class="section-title">Дневник</h3>
                 
                 <div class="calendar">
@@ -116,8 +116,8 @@
                 </div>
             </section>
 
-            <!-- Статистика -->
-            <section class="stats-section hidden" id="stats-section"> <!-- Добавлен класс hidden -->
+            <!-- Статистика (на главной) -->
+            <section class="stats-section hidden" id="stats-section">
                 <h3 class="section-title">Статистика</h3>
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -126,7 +126,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="stat-completed">0</div>
-                        <div class="stat-label">Выполнено</div>
+                        <div class="stat-label">Выполнено сегодня</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="stat-total">0</div>
@@ -134,21 +134,45 @@
                     </div>
                 </div>
             </section>
+
+            <!-- НОВОЕ: Практики (тренировки + медитации) -->
+            <section class="practice-section hidden" id="practice-section">
+                <div class="section-header">
+                    <h3 class="section-title">Практики</h3>
+                </div>
+                
+                <div class="practice-tabs">
+                    <button class="tab-btn active" data-tab="workouts">🏋️ Тренировки</button>
+                    <button class="tab-btn" data-tab="meditations">🧘 Медитации</button>
+                </div>
+                
+                <div class="tab-content active" id="workouts-tab">
+                    <div class="videos-grid">
+                        <!-- JS заполнит карточками тренировок -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="meditations-tab">
+                    <div class="videos-grid">
+                        <!-- JS заполнит карточками медитаций -->
+                    </div>
+                </div>
+            </section>
         </main>
 
-        <!-- Нижняя навигация -->
+        <!-- Нижняя навигация (убрана привычки, добавлены практики) -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-page="home">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </button>
-            <button class="nav-btn" data-page="habits">
-                <i class="fas fa-tasks"></i>
-                <span>Привычки</span>
-            </button>
             <button class="nav-btn" data-page="diary">
                 <i class="fas fa-book"></i>
                 <span>Дневник</span>
+            </button>
+            <button class="nav-btn" data-page="practice">
+                <i class="fas fa-video"></i>
+                <span>Практики</span>
             </button>
         </nav>
     </div>
@@ -187,6 +211,6 @@
         </div>
     </div>
 
-    <script src="app.js"></script> <!-- Исправлен путь к JS -->
+    <script src="app.js"></script>
 </body>
 </html>
