@@ -1,18 +1,17 @@
-// ==================== ИНИЦИАЛИЗАЦИЯ TELEGRAM ====================
+// ==================== TELEGRAM ====================
 const tg = window.Telegram?.WebApp;
 let tgUser = null;
-
 if (tg) {
     tg.expand();
     tg.enableClosingConfirmation();
     tgUser = tg.initDataUnsafe?.user;
 }
 
-// ==================== СОСТОЯНИЕ ПРИЛОЖЕНИЯ ====================
+// ==================== СОСТОЯНИЕ ====================
 const state = {
     habits: [],
     notes: [],
-    currentMood: 4,
+    currentMood: null,
     streak: 0,
     currentPage: 'home',
     currentWeek: 0,
@@ -23,7 +22,6 @@ const state = {
 
 // ==================== DOM ЭЛЕМЕНТЫ ====================
 const elements = {
-    // Секции
     welcomeCard: document.getElementById('welcome-card'),
     moodSection: document.getElementById('mood-section'),
     habitsSection: document.getElementById('habits-section'),
@@ -32,19 +30,16 @@ const elements = {
     practiceSection: document.getElementById('practice-section'),
     accountSection: document.getElementById('account-section'),
 
-    // Списки
     habitsList: document.getElementById('habits-list'),
     notesList: document.getElementById('notes-list'),
     weekDates: document.getElementById('week-dates'),
 
-    // Статистика
     streakCount: document.getElementById('streak-count'),
     habitsCounter: document.getElementById('habits-counter'),
     statStreak: document.getElementById('stat-streak'),
     statCompleted: document.getElementById('stat-completed'),
     statTotal: document.getElementById('stat-total'),
 
-    // Аккаунт
     accountName: document.getElementById('account-name'),
     accountAvatar: document.getElementById('account-avatar'),
     accountStatStreak: document.getElementById('account-stat-streak'),
@@ -52,25 +47,21 @@ const elements = {
     accountStatNotes: document.getElementById('account-stat-notes'),
     themeToggle: document.getElementById('theme-toggle'),
 
-    // Кнопки
     addHabitBtn: document.getElementById('add-habit-btn'),
     navBtns: document.querySelectorAll('.bottom-nav .nav-btn'),
     moodBtns: document.querySelectorAll('.mood-btn'),
 
-    // Модалки
     habitModal: document.getElementById('habit-modal'),
     noteModal: document.getElementById('note-modal'),
     habitInput: document.getElementById('habit-input'),
     noteInput: document.getElementById('note-input'),
     charCount: document.getElementById('char-count'),
 
-    // Календарь
     prevWeekBtn: document.getElementById('prev-week'),
     nextWeekBtn: document.getElementById('next-week'),
     monthTitle: document.getElementById('month-title'),
     searchNotes: document.getElementById('search-notes'),
 
-    // Приветствие
     greeting: document.getElementById('greeting'),
     currentDate: document.getElementById('current-date')
 };
@@ -79,7 +70,7 @@ const elements = {
 document.addEventListener('DOMContentLoaded', initApp);
 
 function initApp() {
-    loadData();                 // загружаем из localStorage
+    loadData();
     applyTheme(state.darkTheme);
     setupGreeting();
     setupEventListeners();
@@ -92,17 +83,16 @@ function initApp() {
 // ==================== ПРИВЕТСТВИЕ ====================
 function setupGreeting() {
     const now = new Date();
-    const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
-    let userName = 'Друг';
-    if (tgUser) userName = tgUser.first_name || 'Друг';
-    if (elements.greeting) elements.greeting.textContent = `Привет, ${userName}!`;
-    if (elements.currentDate) elements.currentDate.textContent = now.toLocaleDateString('ru-RU', dateOptions);
-    if (elements.accountName) elements.accountName.textContent = userName;
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    let name = 'Друг';
+    if (tgUser) name = tgUser.first_name || 'Друг';
+    if (elements.greeting) elements.greeting.textContent = `Привет, ${name}!`;
+    if (elements.currentDate) elements.currentDate.textContent = now.toLocaleDateString('ru-RU', options);
+    if (elements.accountName) elements.accountName.textContent = name;
 }
 
 // ==================== ОБРАБОТЧИКИ ====================
 function setupEventListeners() {
-    // Нижняя навигация
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -112,7 +102,6 @@ function setupEventListeners() {
         });
     });
 
-    // Настроение
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -122,7 +111,6 @@ function setupEventListeners() {
         });
     });
 
-    // Добавление привычки
     if (elements.addHabitBtn) {
         elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
@@ -130,7 +118,6 @@ function setupEventListeners() {
         });
     }
 
-    // Календарь: стрелки недели
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -142,16 +129,11 @@ function setupEventListeners() {
         });
     }
 
-    // Поиск заметок
     elements.searchNotes?.addEventListener('input', renderNotes);
 
-    // Модальные окна
     setupModalControls();
-
-    // Табы практик
     setupPracticeTabs();
 
-    // Переключатель темы
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -162,7 +144,6 @@ function setupEventListeners() {
 }
 
 function setupModalControls() {
-    // Привычка
     document.querySelectorAll('.close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
@@ -174,7 +155,6 @@ function setupModalControls() {
         if (e.key === 'Enter') saveHabit();
     });
 
-    // Заметка
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -187,7 +167,6 @@ function setupModalControls() {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
-    // Закрытие по фону
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
@@ -227,7 +206,7 @@ function switchPage(page) {
     }
 }
 
-// ==================== ТЕМНАЯ ТЕМА ====================
+// ==================== ТЁМНАЯ ТЕМА ====================
 function applyTheme(isDark) {
     if (isDark) {
         document.body.classList.add('dark-theme');
@@ -246,7 +225,7 @@ function setMood(mood) {
     showToast('Настроение сохранено');
 }
 
-// ==================== ПРИВЫЧКИ (ЛОГИКА) ====================
+// ==================== ПРИВЫЧКИ ====================
 function getTodayString() {
     return new Date().toISOString().split('T')[0];
 }
@@ -391,15 +370,17 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
-// ==================== КАЛЕНДАРЬ (ИСПРАВЛЕН) ====================
+// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
-    if (!elements.weekDates || !elements.monthTitle) return;
+    if (!elements.weekDates) return;
     const today = new Date();
     const currentDate = new Date();
     currentDate.setDate(today.getDate() + (state.currentWeek * 7));
     const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    if (elements.monthTitle) {
+        elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    }
 
     const monday = new Date(currentDate);
     const day = monday.getDay();
@@ -418,12 +399,15 @@ function renderCalendar() {
             <div>${date.getDate()}</div>
             <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
         `;
+
         if (isSameDay(date, today)) btn.classList.add('today');
         if (state.selectedDate && isSameDay(date, state.selectedDate)) btn.classList.add('selected');
+
         const hasNote = state.notes.some(note => {
             try { return isSameDay(new Date(note.date), date); } catch { return false; }
         });
         if (hasNote) btn.classList.add('has-note');
+
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
 
         const dateCopy = new Date(date);
@@ -449,26 +433,36 @@ function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
     let filtered = state.notes.filter(n => n.text.toLowerCase().includes(query))
-        .sort((a,b) => new Date(b.date) - new Date(a.date));
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
     if (filtered.length === 0) {
         elements.notesList.innerHTML = `<div class="empty-state"><div class="emoji">📝</div><p>${query ? 'Заметки не найдены' : 'Пока нет заметок'}</p></div>`;
         return;
     }
+
+    const moodEmojis = ['', '😢', '😔', '😐', '🙂', '😊'];
+
     elements.notesList.innerHTML = filtered.map(note => {
         const date = new Date(note.date);
-        const today = new Date(), yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
-        let display = date.toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+        const today = new Date(), yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        let display = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
         if (isSameDay(date, today)) display = 'Сегодня';
-        if (isSameDay(date, yesterday)) display = 'Вчера';
-        const preview = note.text.length > 100 ? note.text.substring(0,100)+'...' : note.text;
+        else if (isSameDay(date, yesterday)) display = 'Вчера';
+        const preview = note.text.length > 100 ? note.text.slice(0, 100) + '…' : note.text;
+        const moodEmoji = note.mood ? moodEmojis[note.mood] : '';
         return `<div class="note-card" data-id="${note.id}">
-                    <div class="note-header"><div class="note-date">${display}</div></div>
+                    <div class="note-header">
+                        <div class="note-date">${display}</div>
+                        ${moodEmoji ? `<div class="note-mood">${moodEmoji}</div>` : ''}
+                    </div>
                     <div class="note-text">${preview}</div>
                 </div>`;
     }).join('');
+
     document.querySelectorAll('.note-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const id = parseInt(card.dataset.id);
+        card.addEventListener('click', function () {
+            const id = parseInt(this.dataset.id);
             const note = state.notes.find(n => n.id === id);
             if (note) {
                 state.editingNoteId = id;
@@ -490,19 +484,28 @@ function openNoteModal(note = null) {
 
 function saveNote() {
     const text = elements.noteInput?.value.trim();
-    if (!text) { showToast('Введите текст заметки'); return; }
+    if (!text) {
+        showToast('Введите текст заметки');
+        return;
+    }
+
     if (state.editingNoteId) {
         const idx = state.notes.findIndex(n => n.id === state.editingNoteId);
-        if (idx !== -1) { state.notes[idx].text = text; state.notes[idx].updatedAt = new Date().toISOString(); }
+        if (idx !== -1) {
+            state.notes[idx].text = text;
+            state.notes[idx].updatedAt = new Date().toISOString();
+        }
     } else {
         state.notes.push({
             id: Date.now(),
             date: state.selectedDate.toISOString(),
             text,
+            mood: state.currentMood,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         });
     }
+
     hideModal('note-modal');
     if (elements.noteInput) elements.noteInput.value = '';
     state.editingNoteId = null;
@@ -528,35 +531,39 @@ function setupPracticeTabs() {
 
 function renderPracticeContent() {
     const workouts = [
-        { title: 'Утренняя зарядка', duration: '10 мин', url: '#', thumbnail: '🏋️' },
-        { title: 'Йога для начинающих', duration: '20 мин', url: '#', thumbnail: '🧘' },
-        { title: 'Кардио дома', duration: '15 мин', url: '#', thumbnail: '🔥' },
+        { title: 'Утренняя зарядка', duration: '10 мин', url: '#', thumb: '🏋️' },
+        { title: 'Йога для начинающих', duration: '20 мин', url: '#', thumb: '🧘' },
+        { title: 'Кардио дома', duration: '15 мин', url: '#', thumb: '🔥' }
     ];
     const meditations = [
-        { title: 'Осознанное дыхание', duration: '5 мин', url: '#', thumbnail: '🌿' },
-        { title: 'Сканирование тела', duration: '15 мин', url: '#', thumbnail: '🧠' },
-        { title: 'Медитация благодарности', duration: '10 мин', url: '#', thumbnail: '💖' },
+        { title: 'Осознанное дыхание', duration: '5 мин', url: '#', thumb: '🌿' },
+        { title: 'Сканирование тела', duration: '15 мин', url: '#', thumb: '🧠' },
+        { title: 'Медитация благодарности', duration: '10 мин', url: '#', thumb: '💖' }
     ];
     const wTab = document.getElementById('workouts-tab');
     const mTab = document.getElementById('meditations-tab');
-    if (wTab) wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
-        <div class="video-card">
-            <div class="video-thumbnail">${v.thumbnail}</div>
-            <div class="video-info">
-                <div class="video-title">${v.title}</div>
-                <div class="video-duration">${v.duration}</div>
-                <a href="${v.url}" target="_blank" class="video-link">Смотреть</a>
-            </div>
-        </div>`).join('')}</div>`;
-    if (mTab) mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
-        <div class="video-card">
-            <div class="video-thumbnail">${v.thumbnail}</div>
-            <div class="video-info">
-                <div class="video-title">${v.title}</div>
-                <div class="video-duration">${v.duration}</div>
-                <a href="${v.url}" target="_blank" class="video-link">Смотреть</a>
-            </div>
-        </div>`).join('')}</div>`;
+    if (wTab) {
+        wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
+            <div class="video-card">
+                <div class="video-thumbnail">${v.thumb}</div>
+                <div class="video-info">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-duration">${v.duration}</div>
+                    <a href="${v.url}" target="_blank" class="video-link">Смотреть</a>
+                </div>
+            </div>`).join('')}</div>`;
+    }
+    if (mTab) {
+        mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
+            <div class="video-card">
+                <div class="video-thumbnail">${v.thumb}</div>
+                <div class="video-info">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-duration">${v.duration}</div>
+                    <a href="${v.url}" target="_blank" class="video-link">Смотреть</a>
+                </div>
+            </div>`).join('')}</div>`;
+    }
 }
 
 // ==================== АККАУНТ ====================
@@ -576,20 +583,23 @@ function hideModal(modalId) {
 
 // ==================== TOAST ====================
 function showToast(message) {
-    if (tg?.showAlert) { tg.showAlert(message); return; }
+    if (tg?.showAlert) {
+        tg.showAlert(message);
+        return;
+    }
     const toast = document.createElement('div');
     toast.textContent = message;
     toast.style.cssText = `
         position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
         background: var(--text-primary); color: var(--bg-primary);
-        padding: 12px 24px; border-radius: 30px; font-size: 14px;
+        padding: 12px 24px; border-radius: 40px; font-size: 14px;
         z-index: 1000; animation: fadeInOut 2s ease;
     `;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
 }
 
-// ==================== СОХРАНЕНИЕ / ЗАГРУЗКА ====================
+// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ====================
 function saveData() {
     const data = {
         habits: state.habits,
@@ -609,14 +619,22 @@ function loadData() {
             const data = JSON.parse(saved);
             state.habits = migrateHabits(data.habits || []);
             state.notes = data.notes || [];
-            state.currentMood = data.currentMood || 4;
+            state.currentMood = data.currentMood || null;
             state.streak = data.streak || 0;
             state.darkTheme = data.darkTheme || false;
+
             calculateOverallStreak();
-            elements.moodBtns.forEach(btn => {
-                if (parseInt(btn.dataset.mood) === state.currentMood) btn.classList.add('active');
-            });
-        } catch (e) { console.error('Ошибка загрузки', e); }
+
+            if (state.currentMood) {
+                elements.moodBtns.forEach(btn => {
+                    if (parseInt(btn.dataset.mood) === state.currentMood) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Ошибка загрузки данных', e);
+        }
     }
 }
 
