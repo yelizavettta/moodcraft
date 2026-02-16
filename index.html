@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MoodCraft — трекер привычек</title>
+    <!-- Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Font Awesome и Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="app.css">
+    <!-- Наш CSS -->
+    <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#027368">
 </head>
 <body>
     <div id="app">
+        <!-- ШАПКА -->
         <header class="app-header">
             <div class="header-content">
                 <div class="logo">
@@ -24,6 +28,7 @@
             </div>
         </header>
 
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
         <main class="app-content" id="app-content">
             <!-- ГЛАВНАЯ -->
             <section class="welcome-card hidden" id="welcome-card">
@@ -152,7 +157,7 @@
                         </label>
                     </div>
                     <div class="setting-item">
-                        <span class="setting-label"><i class="fas fa-download"></i> Экспорт данных</span>
+                        <span class="setting-label"><i class="fas fa-cog"></i> Настройки</span>
                         <i class="fas fa-chevron-right" style="color: var(--text-tertiary);"></i>
                     </div>
                     <div class="setting-item">
@@ -163,6 +168,7 @@
             </section>
         </main>
 
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-page="home"><i class="fas fa-home"></i><span>Главная</span></button>
             <button class="nav-btn" data-page="diary"><i class="fas fa-book"></i><span>Дневник</span></button>
@@ -171,7 +177,7 @@
         </nav>
     </div>
 
-    <!-- Модальные окна -->
+    <!-- Модальное окно для новой привычки -->
     <div class="modal" id="habit-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -188,6 +194,7 @@
         </div>
     </div>
 
+    <!-- Модальное окно для заметки (редактирование/создание) -->
     <div class="modal" id="note-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -195,9 +202,25 @@
                 <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- Текст заметки -->
                 <textarea id="note-input" placeholder="Опишите свой день..." maxlength="1000" class="modal-textarea"></textarea>
                 <div class="char-count" id="char-count">0/1000</div>
-                <div class="modal-actions">
+
+                <!-- Выбор настроения для этой заметки (добавлено) -->
+                <div class="note-mood-selector">
+                    <label>Настроение:</label>
+                    <div class="mood-grid mini-mood-grid">
+                        <button class="mood-option" data-mood="1">😢</button>
+                        <button class="mood-option" data-mood="2">😔</button>
+                        <button class="mood-option" data-mood="3">😐</button>
+                        <button class="mood-option" data-mood="4">🙂</button>
+                        <button class="mood-option" data-mood="5">😊</button>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий: удалить, отмена, сохранить -->
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button class="btn danger" id="note-delete-btn"><i class="fas fa-trash"></i> Удалить</button>
                     <button class="btn secondary" id="note-cancel-btn">Отмена</button>
                     <button class="btn primary" id="note-save-btn">✓</button>
                 </div>
@@ -205,6 +228,7 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Подключаем основной скрипт -->
+    <script src="script.js"></script>
 </body>
 </html>
