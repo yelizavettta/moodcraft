@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MoodCraft — трекер привычек</title>
+    <!-- Telegram Web App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Font Awesome и Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Наш CSS -->
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#027368">
+</head>
+<body>
+    <div id="app">
+        <!-- ШАПКА -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>MoodCraft</h1>
+                </div>
+                <div class="streak-badge" id="streak-badge">
+                    <i class="fas fa-fire"></i>
+                    <span id="streak-count">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <main class="app-content" id="app-content">
+            <!-- ГЛАВНАЯ -->
+            <section class="welcome-card hidden" id="welcome-card">
+                <div class="welcome-text">
+                    <h2 id="greeting">Привет!</h2>
+                    <p id="current-date">Загружаем...</p>
+                </div>
+            </section>
+
+            <section class="mood-section hidden" id="mood-section">
+                <h3 class="section-title">Твоё настроение</h3>
+                <div class="mood-grid">
+                    <button class="mood-btn" data-mood="1">
+                        <span class="mood-emoji">😢</span>
+                        <span class="mood-label">Плохо</span>
+                    </button>
+                    <button class="mood-btn" data-mood="2">
+                        <span class="mood-emoji">😔</span>
+                        <span class="mood-label">Не очень</span>
+                    </button>
+                    <button class="mood-btn" data-mood="3">
+                        <span class="mood-emoji">😐</span>
+                        <span class="mood-label">Нормально</span>
+                    </button>
+                    <button class="mood-btn" data-mood="4">
+                        <span class="mood-emoji">🙂</span>
+                        <span class="mood-label">Хорошо</span>
+                    </button>
+                    <button class="mood-btn" data-mood="5">
+                        <span class="mood-emoji">😊</span>
+                        <span class="mood-label">Отлично!</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="stats-section hidden" id="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-streak">0</div>
+                        <div class="stat-label">дней подряд</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-completed">0</div>
+                        <div class="stat-label">сегодня</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">привычек</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="habits-section hidden" id="habits-section">
+                <div class="section-header">
+                    <h3 class="section-title">Привычки</h3>
+                    <span class="habits-counter" id="habits-counter">0/0</span>
+                </div>
+                <div class="habits-list" id="habits-list"></div>
+                <button class="add-btn" id="add-habit-btn">
+                    <i class="fas fa-plus"></i> Новая привычка
+                </button>
+            </section>
+
+            <!-- ДНЕВНИК -->
+            <section class="diary-section hidden" id="diary-section">
+                <h3 class="section-title">Дневник</h3>
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <button id="prev-week"><i class="fas fa-chevron-left"></i></button>
+                        <div class="month-title" id="month-title"></div>
+                        <button id="next-week"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="week-days">
+                        <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+                    </div>
+                    <div class="week-dates" id="week-dates"></div>
+                </div>
+                <div class="notes-search">
+                    <input type="text" id="search-notes" placeholder="Поиск заметок..." class="search-input">
+                </div>
+                <div class="notes-list" id="notes-list"></div>
+            </section>
+
+            <!-- ПРАКТИКИ -->
+            <section class="practice-section hidden" id="practice-section">
+                <div class="section-header">
+                    <h3 class="section-title">Практики</h3>
+                </div>
+                <div class="practice-tabs">
+                    <button class="tab-btn active" data-tab="workouts">🏋️ Тренировки</button>
+                    <button class="tab-btn" data-tab="meditations">🧘 Медитации</button>
+                </div>
+                <div class="tab-content active" id="workouts-tab"></div>
+                <div class="tab-content" id="meditations-tab"></div>
+            </section>
+
+            <!-- АККАУНТ -->
+            <section class="account-section hidden" id="account-section">
+                <div class="account-header">
+                    <div class="account-avatar" id="account-avatar">👤</div>
+                    <div class="account-info">
+                        <h3 id="account-name">Загрузка...</h3>
+                        <p id="account-email">Telegram Web App</p>
+                    </div>
+                </div>
+                <div class="account-stats">
+                    <div class="account-stat-card">
+                        <div class="account-stat-value" id="account-stat-streak">0</div>
+                        <div class="account-stat-label">🔥 дней подряд</div>
+                    </div>
+                    <div class="account-stat-card">
+                        <div class="account-stat-value" id="account-stat-habits">0</div>
+                        <div class="account-stat-label">📋 привычек</div>
+                    </div>
+                    <div class="account-stat-card">
+                        <div class="account-stat-value" id="account-stat-notes">0</div>
+                        <div class="account-stat-label">📝 заметок</div>
+                    </div>
+                </div>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <span class="setting-label"><i class="fas fa-moon"></i> Тёмная тема</span>
+                        <label class="theme-switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label"><i class="fas fa-cog"></i> Настройки</span>
+                        <i class="fas fa-chevron-right" style="color: var(--text-tertiary);"></i>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label"><i class="fas fa-info-circle"></i> О приложении</span>
+                        <span style="color: var(--text-tertiary);">v1.3.0</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="home"><i class="fas fa-home"></i><span>Главная</span></button>
+            <button class="nav-btn" data-page="diary"><i class="fas fa-book"></i><span>Дневник</span></button>
+            <button class="nav-btn" data-page="practice"><i class="fas fa-video"></i><span>Практики</span></button>
+            <button class="nav-btn" data-page="account"><i class="fas fa-user"></i><span>Аккаунт</span></button>
+        </nav>
+    </div>
+
+    <!-- Модальное окно для новой привычки -->
+    <div class="modal" id="habit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Новая привычка</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="habit-input" placeholder="Название привычки" maxlength="30" class="modal-input">
+                <div class="modal-actions">
+                    <button class="btn secondary" id="cancel-btn">Отмена</button>
+                    <button class="btn primary" id="save-btn">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для заметки (редактирование/создание) -->
+    <div class="modal" id="note-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="note-title">Новая заметка</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Текст заметки -->
+                <textarea id="note-input" placeholder="Опишите свой день..." maxlength="1000" class="modal-textarea"></textarea>
+                <div class="char-count" id="char-count">0/1000</div>
+
+                <!-- Выбор настроения для этой заметки -->
+                <div class="note-mood-selector">
+                    <label>Настроение:</label>
+                    <div class="mini-mood-grid">
+                        <button class="mood-option" data-mood="1">😢</button>
+                        <button class="mood-option" data-mood="2">😔</button>
+                        <button class="mood-option" data-mood="3">😐</button>
+                        <button class="mood-option" data-mood="4">🙂</button>
+                        <button class="mood-option" data-mood="5">😊</button>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий: удалить, отмена, сохранить -->
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button class="btn danger" id="note-delete-btn"><i class="fas fa-trash"></i> Удалить</button>
+                    <button class="btn secondary" id="note-cancel-btn">Отмена</button>
+                    <button class="btn primary" id="note-save-btn">✓</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключаем основной скрипт -->
+    <script src="script.js"></script>
+</body>
+</html>
