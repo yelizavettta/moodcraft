@@ -1,13 +1,13 @@
-/* ===== ПЕРЕМЕННЫЕ ===== */
+/* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ (СВЕТЛАЯ ТЕМА) ===== */
 :root {
-    --bg-primary: #f2f2f2;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-    --bg-elevated: #ffffff;
-    --text-primary: #191726;
-    --text-secondary: #5d7173;
-    --text-tertiary: #8a9c9e;
-    --accent: #027368;
+    --bg-primary: #f2f2f2;           /* основной фон */
+    --bg-secondary: #ffffff;          /* фон шапки, навигации */
+    --bg-card: #ffffff;               /* фон карточек */
+    --bg-elevated: #ffffff;           /* для модалок */
+    --text-primary: #191726;          /* основной текст */
+    --text-secondary: #5d7173;        /* второстепенный */
+    --text-tertiary: #8a9c9e;         /* совсем бледный */
+    --accent: #027368;                 /* акцентный зелёный */
     --accent-soft: #e0f0ef;
     --accent-light: #b4bebf;
     --border: #d9e0e0;
@@ -24,15 +24,16 @@
     --font-main: 'Inter', sans-serif;
 }
 
+/* ===== ТЁМНАЯ ТЕМА (ЧЁРНО-СЕРАЯ) ===== */
 .dark-theme {
-    --bg-primary: #191726;
-    --bg-secondary: #242237;
-    --bg-card: #2a283d;
-    --bg-elevated: #323046;
+    --bg-primary: #121212;            /* глубокий чёрный */
+    --bg-secondary: #1e1e1e;          /* темно-серый */
+    --bg-card: #2d2d2d;                /* карточки */
+    --bg-elevated: #383838;            /* модалки */
     --text-primary: #f2f2f2;
     --text-secondary: #b4bebf;
     --text-tertiary: #a0acae;
-    --accent: #027368;
+    --accent: #027368;                 /* акцент не меняем */
     --accent-soft: #2a4a4a;
     --accent-light: #5d7173;
     --border: #404352;
@@ -44,6 +45,7 @@
     --shadow-lg: 0 20px 36px rgba(0,0,0,0.6);
 }
 
+/* ===== СБРОС ===== */
 * {
     margin: 0;
     padding: 0;
@@ -127,7 +129,7 @@ body {
     gap: 28px;
 }
 
-/* ===== ПРИВЕТСТВИЕ — ЯРКОЕ, С АНИМАЦИЕЙ ===== */
+/* ===== ПРИВЕТСТВИЕ ===== */
 .welcome-card {
     background: linear-gradient(145deg, #027368, #0a8a7a);
     border: none;
@@ -225,6 +227,7 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
+/* Одинаковые размеры: фиксированная ширина задаётся grid-ом, высота через min-height */
 .mood-btn.active {
     border-color: var(--accent);
     background: var(--accent-soft);
@@ -244,6 +247,35 @@ body {
     font-size: 12px;
     font-weight: 600;
     color: var(--text-tertiary);
+}
+
+/* Мини-сетка для выбора настроения в модалке заметки */
+.mini-mood-grid {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: space-around;
+}
+
+.mood-option {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg-card);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary);
+}
+
+.mood-option.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    transform: scale(1.1);
 }
 
 /* ===== СТАТИСТИКА ===== */
@@ -400,7 +432,7 @@ body {
     transform: scale(0.97);
 }
 
-/* ===== КАЛЕНДАРЬ — НОВЫЙ ДИЗАЙН ===== */
+/* ===== КАЛЕНДАРЬ ===== */
 .calendar {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -512,7 +544,7 @@ body {
     transform: scale(0.94);
 }
 
-/* День недели под цифрой — убираем или делаем меньше */
+/* День недели под цифрой */
 .date-btn div:last-child {
     font-size: 10px;
     margin-top: 2px;
@@ -988,9 +1020,17 @@ input:checked + .slider:before {
     margin-bottom: 20px;
 }
 
+/* Стили для кнопки удаления (красная) */
+.btn.danger {
+    background: var(--danger);
+    color: white;
+    border: none;
+}
+
 .modal-actions {
     display: flex;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -1025,7 +1065,7 @@ input:checked + .slider:before {
     display: none !important;
 }
 
-/* ===== АДАПТАЦИЯ ===== */
+/* ===== АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ ===== */
 @media (max-width: 380px) {
     .app-content {
         padding: 20px;
@@ -1066,7 +1106,7 @@ input:checked + .slider:before {
     }
 }
 
-/* ===== SAFE AREA ===== */
+/* ===== SAFE AREA ДЛЯ НОВЫХ АЙФОНОВ ===== */
 @supports (padding: max(0px)) {
     .bottom-nav {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
