@@ -126,7 +126,8 @@ function setupEventListeners() {
 
     // Кнопка добавления привычки
     if (elements.addHabitBtn) {
-        elements.addHuntBtn.addEventListener('click', () => {
+        // FIXED: было elements.addHuntBtn, исправлено на addHabitBtn
+        elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
             elements.habitInput?.focus();
         });
