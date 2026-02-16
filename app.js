@@ -1,26 +1,33 @@
-// ==================== TELEGRAM ====================
-const tg = window.Telegram?.WebApp;
-let tgUser = null;
+// =====================================================
+// MoodCraft — Telegram Mini App
+// Основной файл с логикой приложения
+// Комментарии написаны простым языком, чтобы было понятно
+// =====================================================
+
+// ==================== РАБОТА С TELEGRAM ====================
+const tg = window.Telegram?.WebApp;          // Объект Telegram Web App
+let tgUser = null;                           // Данные пользователя из Telegram
 if (tg) {
-    tg.expand();
-    tg.enableClosingConfirmation();
-    tgUser = tg.initDataUnsafe?.user;
+    tg.expand();                              // Растягиваем на весь экран
+    tg.enableClosingConfirmation();            // Подтверждение при закрытии
+    tgUser = tg.initDataUnsafe?.user;          // Получаем информацию о юзере
 }
 
-// ==================== СОСТОЯНИЕ ====================
+// ==================== ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ ====================
 const state = {
-    habits: [],
-    notes: [],
-    currentMood: null,
-    streak: 0,
-    currentPage: 'home',
-    currentWeek: 0,
-    selectedDate: new Date(),
-    editingNoteId: null,
-    darkTheme: false
+    habits: [],                                // Список привычек
+    notes: [],                                 // Заметки
+    currentMood: null,                          // Текущее настроение (1-5)
+    streak: 0,                                  // Общая серия дней
+    currentPage: 'home',                         // Активная страница (home, diary, practice, account)
+    currentWeek: 0,                              // Смещение недели для календаря
+    selectedDate: new Date(),                    // Выбранная дата в календаре
+    editingNoteId: null,                          // ID заметки, которую редактируем (null если новая)
+    darkTheme: false                              // Флаг тёмной темы
 };
 
-// ==================== DOM ЭЛЕМЕНТЫ ====================
+// ==================== ССЫЛКИ НА DOM-ЭЛЕМЕНТЫ ====================
+// Чтобы не писать document.getElementById каждый раз
 const elements = {
     welcomeCard: document.getElementById('welcome-card'),
     moodSection: document.getElementById('mood-section'),
@@ -63,24 +70,28 @@ const elements = {
     searchNotes: document.getElementById('search-notes'),
 
     greeting: document.getElementById('greeting'),
-    currentDate: document.getElementById('current-date')
+    currentDate: document.getElementById('current-date'),
+
+    // Новые элементы для выбора настроения в модалке заметки
+    noteMoodOptions: document.querySelectorAll('.mood-option'),
+    noteDeleteBtn: document.getElementById('note-delete-btn')
 };
 
-// ==================== ИНИЦИАЛИЗАЦИЯ ====================
+// ==================== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ====================
 document.addEventListener('DOMContentLoaded', initApp);
 
 function initApp() {
-    loadData();
-    applyTheme(state.darkTheme);
-    setupGreeting();
-    setupEventListeners();
-    render();
-    renderPracticeContent();
-    renderAccountStats();
-    switchPage('home');
+    loadData();                               // Загружаем данные из localStorage
+    applyTheme(state.darkTheme);                // Применяем сохранённую тему
+    setupGreeting();                            // Устанавливаем приветствие
+    setupEventListeners();                       // Вешаем обработчики событий
+    render();                                    // Отрисовываем главную страницу
+    renderPracticeContent();                     // Заполняем раздел практик
+    renderAccountStats();                        // Обновляем статистику в аккаунте
+    switchPage('home');                          // Показываем главную страницу
 }
 
-// ==================== ПРИВЕТСТВИЕ ====================
+// ==================== ПРИВЕТСТВИЕ И ДАТА ====================
 function setupGreeting() {
     const now = new Date();
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
@@ -91,8 +102,9 @@ function setupGreeting() {
     if (elements.accountName) elements.accountName.textContent = name;
 }
 
-// ==================== ОБРАБОТЧИКИ ====================
+// ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
 function setupEventListeners() {
+    // Переключение страниц через нижнее меню
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -102,6 +114,7 @@ function setupEventListeners() {
         });
     });
 
+    // Выбор настроения на главной
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -111,13 +124,15 @@ function setupEventListeners() {
         });
     });
 
+    // Кнопка добавления привычки
     if (elements.addHabitBtn) {
-        elements.addHabitBtn.addEventListener('click', () => {
+        elements.addHuntBtn.addEventListener('click', () => {
             showModal('habit-modal');
             elements.habitInput?.focus();
         });
     }
 
+    // Переключение недели в календаре
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -129,11 +144,16 @@ function setupEventListeners() {
         });
     }
 
+    // Поиск по заметкам
     elements.searchNotes?.addEventListener('input', renderNotes);
 
+    // Управление модальными окнами
     setupModalControls();
+
+    // Вкладки в разделе практик
     setupPracticeTabs();
 
+    // Переключение тёмной темы
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -143,18 +163,23 @@ function setupEventListeners() {
     }
 }
 
+// ==================== УПРАВЛЕНИЕ МОДАЛКАМИ ====================
 function setupModalControls() {
-    document.querySelectorAll('.close-btn, #cancel-btn').forEach(btn => {
+    // Закрытие модалки привычки по крестику или кнопке "Отмена"
+    document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
             if (elements.habitInput) elements.habitInput.value = '';
         });
     });
+    // Сохранение привычки
     document.getElementById('save-btn')?.addEventListener('click', saveHabit);
+    // Сохранение по Enter
     elements.habitInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') saveHabit();
     });
 
+    // Закрытие модалки заметки
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -162,11 +187,31 @@ function setupModalControls() {
             state.editingNoteId = null;
         });
     });
+
+    // Сохранение заметки
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
+
+    // Удаление заметки (новая кнопка)
+    if (elements.noteDeleteBtn) {
+        elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
+    }
+
+    // Счётчик символов в заметке
     elements.noteInput?.addEventListener('input', (e) => {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
+    // Выбор настроения внутри модалки заметки
+    elements.noteMoodOptions.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Убираем выделение со всех
+            elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
+            // Выделяем текущую
+            btn.classList.add('selected');
+        });
+    });
+
+    // Закрытие модалки при клике на фон
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
@@ -174,10 +219,11 @@ function setupModalControls() {
     });
 }
 
-// ==================== НАВИГАЦИЯ ====================
+// ==================== НАВИГАЦИЯ ПО СТРАНИЦАМ ====================
 function switchPage(page) {
     state.currentPage = page;
 
+    // Скрываем все секции
     const sections = [
         elements.welcomeCard,
         elements.moodSection,
@@ -189,6 +235,7 @@ function switchPage(page) {
     ];
     sections.forEach(el => el?.classList.add('hidden'));
 
+    // Показываем нужные
     if (page === 'home') {
         elements.welcomeCard?.classList.remove('hidden');
         elements.moodSection?.classList.remove('hidden');
@@ -226,10 +273,12 @@ function setMood(mood) {
 }
 
 // ==================== ПРИВЫЧКИ ====================
+// Возвращает сегодняшнюю дату в формате YYYY-MM-DD
 function getTodayString() {
     return new Date().toISOString().split('T')[0];
 }
 
+// Преобразует старые данные привычек (без completedDates) в новый формат
 function migrateHabits(habits) {
     return habits.map(habit => ({
         ...habit,
@@ -237,6 +286,8 @@ function migrateHabits(habits) {
     }));
 }
 
+// Пересчитывает общую серию дней (максимальная непрерывная цепочка дней,
+// в которые была выполнена хотя бы одна привычка)
 function calculateOverallStreak() {
     const activeDays = new Set();
     state.habits.forEach(habit => {
@@ -264,11 +315,13 @@ function calculateOverallStreak() {
     state.streak = max;
 }
 
+// Сколько привычек выполнено сегодня
 function getCompletedTodayCount() {
     const today = getTodayString();
     return state.habits.filter(h => h.completedDates.includes(today)).length;
 }
 
+// Отметить/снять отметку выполнения привычки
 function toggleHabit(id) {
     const habit = state.habits.find(h => h.id === id);
     if (!habit) return;
@@ -285,6 +338,7 @@ function toggleHabit(id) {
     showToast(idx === -1 ? 'Выполнено!' : 'Отменено');
 }
 
+// Удалить привычку
 function deleteHabit(id) {
     if (confirm('Удалить привычку?')) {
         state.habits = state.habits.filter(h => h.id !== id);
@@ -295,6 +349,7 @@ function deleteHabit(id) {
     }
 }
 
+// Сохранить новую привычку из модалки
 function saveHabit() {
     const title = elements.habitInput?.value.trim();
     if (!title) {
@@ -315,12 +370,13 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
-// ==================== ОТРИСОВКА ====================
+// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
 function render() {
     renderHabits();
     updateStats();
 }
 
+// Показать список привычек
 function renderHabits() {
     if (!elements.habitsList || !elements.habitsCounter) return;
     if (state.habits.length === 0) {
@@ -361,6 +417,7 @@ function renderHabits() {
     }).join('');
 }
 
+// Обновить статистику на главной
 function updateStats() {
     const completedToday = getCompletedTodayCount();
     const total = state.habits.length;
@@ -371,6 +428,7 @@ function updateStats() {
 }
 
 // ==================== КАЛЕНДАРЬ ====================
+// Показывает неделю с понедельника по воскресенье
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -382,9 +440,10 @@ function renderCalendar() {
         elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     }
 
+    // Находим понедельник этой недели
     const monday = new Date(currentDate);
-    const day = monday.getDay();
-    const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
+    const day = monday.getDay(); // 0 = воскресенье, 1 = понедельник, ...
+    const diff = monday.getDate() - day + (day === 0 ? -6 : 1); // Коррекция, чтобы понедельник был первым
     monday.setDate(diff);
 
     elements.weekDates.innerHTML = '';
@@ -415,12 +474,13 @@ function renderCalendar() {
             e.stopPropagation();
             state.selectedDate = dateCopy;
             renderCalendar();
-            openNoteModal();
+            openNoteModal(); // Открываем модалку для создания заметки на выбранный день
         });
         elements.weekDates.appendChild(btn);
     }
 }
 
+// Сравнение двух дат (без учёта времени)
 function isSameDay(date1, date2) {
     if (!date1 || !date2) return false;
     return date1.getDate() === date2.getDate() &&
@@ -429,6 +489,7 @@ function isSameDay(date1, date2) {
 }
 
 // ==================== ЗАМЕТКИ ====================
+// Отображает список заметок с учётом поиска
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
@@ -460,6 +521,7 @@ function renderNotes() {
                 </div>`;
     }).join('');
 
+    // Клик по карточке заметки открывает её для редактирования
     document.querySelectorAll('.note-card').forEach(card => {
         card.addEventListener('click', function () {
             const id = parseInt(this.dataset.id);
@@ -473,15 +535,32 @@ function renderNotes() {
     });
 }
 
+// Открыть модалку заметки (для создания или редактирования)
 function openNoteModal(note = null) {
+    // Заполняем поля
     if (elements.noteInput) elements.noteInput.value = note ? note.text : '';
     if (elements.charCount) elements.charCount.textContent = `${elements.noteInput?.value.length || 0}/1000`;
+
+    // Устанавливаем заголовок
     const title = document.getElementById('note-title');
     if (title) title.textContent = note ? 'Редактировать заметку' : 'Новая заметка';
+
+    // Выделяем настроение, если оно есть у заметки или берём текущее
+    const moodToSelect = note ? note.mood : state.currentMood;
+    elements.noteMoodOptions.forEach(btn => {
+        const moodVal = parseInt(btn.dataset.mood);
+        if (moodVal === moodToSelect) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+
     showModal('note-modal');
     elements.noteInput?.focus();
 }
 
+// Сохранить заметку (новую или изменённую)
 function saveNote() {
     const text = elements.noteInput?.value.trim();
     if (!text) {
@@ -489,18 +568,29 @@ function saveNote() {
         return;
     }
 
+    // Определяем выбранное настроение (берём из выделенной кнопки в модалке)
+    let selectedMood = null;
+    elements.noteMoodOptions.forEach(btn => {
+        if (btn.classList.contains('selected')) {
+            selectedMood = parseInt(btn.dataset.mood);
+        }
+    });
+
     if (state.editingNoteId) {
+        // Редактирование существующей заметки
         const idx = state.notes.findIndex(n => n.id === state.editingNoteId);
         if (idx !== -1) {
             state.notes[idx].text = text;
+            state.notes[idx].mood = selectedMood; // обновляем настроение
             state.notes[idx].updatedAt = new Date().toISOString();
         }
     } else {
+        // Новая заметка
         state.notes.push({
             id: Date.now(),
             date: state.selectedDate.toISOString(),
             text,
-            mood: state.currentMood,
+            mood: selectedMood,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         });
@@ -515,7 +605,28 @@ function saveNote() {
     showToast('Заметка сохранена');
 }
 
+// Удалить текущую заметку (ту, что открыта в модалке)
+function deleteCurrentNote() {
+    if (!state.editingNoteId) {
+        // Если это новая заметка (ещё не сохранена) — просто закрываем модалку
+        hideModal('note-modal');
+        return;
+    }
+
+    if (confirm('Удалить эту заметку?')) {
+        state.notes = state.notes.filter(n => n.id !== state.editingNoteId);
+        state.editingNoteId = null;
+        hideModal('note-modal');
+        if (elements.noteInput) elements.noteInput.value = '';
+        saveData();
+        renderCalendar();
+        renderNotes();
+        showToast('Заметка удалена');
+    }
+}
+
 // ==================== ПРАКТИКИ ====================
+// Переключение вкладок Тренировки / Медитации
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -529,6 +640,7 @@ function setupPracticeTabs() {
     });
 }
 
+// Заполнение контентом (заглушки, можно заменить на реальные ссылки)
 function renderPracticeContent() {
     const workouts = [
         { title: 'Утренняя зарядка', duration: '10 мин', url: '#', thumb: '🏋️' },
@@ -573,7 +685,7 @@ function renderAccountStats() {
     if (elements.accountStatNotes) elements.accountStatNotes.textContent = state.notes.length;
 }
 
-// ==================== МОДАЛЬНЫЕ ОКНА ====================
+// ==================== МОДАЛЬНЫЕ ОКНА (ПОКАЗАТЬ/СКРЫТЬ) ====================
 function showModal(modalId) {
     document.getElementById(modalId)?.classList.add('active');
 }
@@ -581,12 +693,14 @@ function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
 }
 
-// ==================== TOAST ====================
+// ==================== УВЕДОМЛЕНИЯ (TOAST) ====================
 function showToast(message) {
+    // Если есть Telegram, показываем alert (но он некрасивый, можно заменить)
     if (tg?.showAlert) {
         tg.showAlert(message);
         return;
     }
+    // Создаём временный элемент внизу экрана
     const toast = document.createElement('div');
     toast.textContent = message;
     toast.style.cssText = `
@@ -599,7 +713,7 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2000);
 }
 
-// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ====================
+// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ДАННЫХ (localStorage) ====================
 function saveData() {
     const data = {
         habits: state.habits,
@@ -625,6 +739,7 @@ function loadData() {
 
             calculateOverallStreak();
 
+            // Восстанавливаем активную кнопку настроения на главной
             if (state.currentMood) {
                 elements.moodBtns.forEach(btn => {
                     if (parseInt(btn.dataset.mood) === state.currentMood) {
@@ -638,6 +753,6 @@ function loadData() {
     }
 }
 
-// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
+// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ (для вызова из HTML) ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
