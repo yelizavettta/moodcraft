@@ -498,7 +498,14 @@ function renderNotes() {
         return;
     }
 
-    const moodEmojis = ['', '😭', '😩', '😐', '✨', '🤩'];
+    const moodEmojis = [
+    '', 
+    '<img src="images/mood1.svg" class="note-mood-img" alt="Плохо">',
+    '<img src="images/mood2.svg" class="note-mood-img" alt="Не очень">',
+    '<img src="images/mood3.svg" class="note-mood-img" alt="Нормально">',
+    '<img src="images/mood4.svg" class="note-mood-img" alt="Хорошо">',
+    '<img src="images/mood5.svg" class="note-mood-img" alt="Отлично!">'
+    ];
 
     elements.notesList.innerHTML = filtered.map(note => {
         const date = new Date(note.date);
@@ -738,3 +745,4 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
