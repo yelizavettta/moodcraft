@@ -220,8 +220,8 @@ body {
 }
 
 .mood-emoji {
-    width: 72px;          /* нужный размер */
-    height: 72px;
+    width: 90px;          /* нужный размер */
+    height: 90px;
     display: inline-block;
     object-fit: contain;  /* чтобы не искажалось, если пропорции не 1:1 */
     transition: transform 0.2s;
@@ -1119,6 +1119,7 @@ input:checked + .slider:before {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
+
 
 
 
