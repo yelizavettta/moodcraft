@@ -89,8 +89,14 @@
             </section>
 
             <!-- ДНЕВНИК -->
+            <!-- ДНЕВНИК -->
             <section class="diary-section hidden" id="diary-section">
                 <h3 class="section-title">Дневник</h3>
+                <!-- Поиск заметок теперь сверху -->
+                <div class="notes-search">
+                    <input type="text" id="search-notes" placeholder="Поиск заметок..." class="search-input">
+                </div>
+                <!-- Календарь под поиском -->
                 <div class="calendar">
                     <div class="calendar-header">
                         <button id="prev-week"><i class="fas fa-chevron-left"></i></button>
@@ -98,12 +104,9 @@
                         <button id="next-week"><i class="fas fa-chevron-right"></i></button>
                     </div>
                     <div class="week-days">
-                        <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+                        <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div class="weekend">Сб</div><div class="weekend">Вс</div>
                     </div>
                     <div class="week-dates" id="week-dates"></div>
-                </div>
-                <div class="notes-search">
-                    <input type="text" id="search-notes" placeholder="Поиск заметок..." class="search-input">
                 </div>
                 <div class="notes-list" id="notes-list"></div>
             </section>
@@ -224,3 +227,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
