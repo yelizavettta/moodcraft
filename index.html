@@ -38,15 +38,16 @@
                 </div>
             </section>
 
+            <!-- НАСТРОЕНИЕ (обновлённые эмодзи) -->
             <section class="mood-section hidden" id="mood-section">
                 <h3 class="section-title">Твоё настроение</h3>
                 <div class="mood-grid">
                     <button class="mood-btn" data-mood="1">
-                        <span class="mood-emoji">😢</span>
+                        <span class="mood-emoji">😭</span>
                         <span class="mood-label">Плохо</span>
                     </button>
                     <button class="mood-btn" data-mood="2">
-                        <span class="mood-emoji">😔</span>
+                        <span class="mood-emoji">😩</span>
                         <span class="mood-label">Не очень</span>
                     </button>
                     <button class="mood-btn" data-mood="3">
@@ -54,11 +55,11 @@
                         <span class="mood-label">Нормально</span>
                     </button>
                     <button class="mood-btn" data-mood="4">
-                        <span class="mood-emoji">🙂</span>
+                        <span class="mood-emoji">✨</span>
                         <span class="mood-label">Хорошо</span>
                     </button>
                     <button class="mood-btn" data-mood="5">
-                        <span class="mood-emoji">😊</span>
+                        <span class="mood-emoji">🤩</span>
                         <span class="mood-label">Отлично!</span>
                     </button>
                 </div>
@@ -194,7 +195,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно для заметки (редактирование/создание) -->
+    <!-- Модальное окно для заметки -->
     <div class="modal" id="note-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -202,23 +203,20 @@
                 <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Текст заметки -->
                 <textarea id="note-input" placeholder="Опишите свой день..." maxlength="1000" class="modal-textarea"></textarea>
                 <div class="char-count" id="char-count">0/1000</div>
 
-                <!-- Выбор настроения для этой заметки -->
                 <div class="note-mood-selector">
                     <label>Настроение:</label>
                     <div class="mini-mood-grid">
-                        <button class="mood-option" data-mood="1">😢</button>
-                        <button class="mood-option" data-mood="2">😔</button>
+                        <button class="mood-option" data-mood="1">😭</button>
+                        <button class="mood-option" data-mood="2">😩</button>
                         <button class="mood-option" data-mood="3">😐</button>
-                        <button class="mood-option" data-mood="4">🙂</button>
-                        <button class="mood-option" data-mood="5">😊</button>
+                        <button class="mood-option" data-mood="4">✨</button>
+                        <button class="mood-option" data-mood="5">🤩</button>
                     </div>
                 </div>
 
-                <!-- Кнопки действий: удалить, отмена, сохранить -->
                 <div class="modal-actions" style="margin-top: 20px;">
                     <button class="btn danger" id="note-delete-btn"><i class="fas fa-trash"></i> Удалить</button>
                     <button class="btn secondary" id="note-cancel-btn">Отмена</button>
@@ -228,7 +226,6 @@
         </div>
     </div>
 
-    <!-- Подключаем основной скрипт -->
     <script src="script.js"></script>
 </body>
 </html>
