@@ -100,6 +100,7 @@ function setupGreeting() {
 }
 
 function setupEventListeners() {
+    // Переключение страниц через нижнее меню
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -109,6 +110,7 @@ function setupEventListeners() {
         });
     });
 
+    // Выбор настроения на главной
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -118,6 +120,7 @@ function setupEventListeners() {
         });
     });
 
+    // Кнопка добавления привычки
     if (elements.addHabitBtn) {
         elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
@@ -125,6 +128,7 @@ function setupEventListeners() {
         });
     }
 
+    // Переключение недели в календаре
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -136,10 +140,16 @@ function setupEventListeners() {
         });
     }
 
+    // Поиск по заметкам
     elements.searchNotes?.addEventListener('input', renderNotes);
+
+    // Управление модальными окнами
     setupModalControls();
+
+    // Вкладки в разделе практик
     setupPracticeTabs();
 
+    // Переключение тёмной темы
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -147,20 +157,32 @@ function setupEventListeners() {
             saveData();
         });
     }
+
+    // НОВОЕ: Скрытие клавиатуры при клике вне поля поиска
+    document.addEventListener('click', function(e) {
+        const searchInput = elements.searchNotes;
+        if (searchInput && !searchInput.contains(e.target)) {
+            searchInput.blur();
+        }
+    });
 }
 
 function setupModalControls() {
+    // Закрытие модалки привычки по крестику или кнопке "Отмена"
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
             if (elements.habitInput) elements.habitInput.value = '';
         });
     });
+    // Сохранение привычки
     document.getElementById('save-btn')?.addEventListener('click', saveHabit);
+    // Сохранение по Enter
     elements.habitInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') saveHabit();
     });
 
+    // Закрытие модалки заметки
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -169,16 +191,20 @@ function setupModalControls() {
         });
     });
 
+    // Сохранение заметки
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
 
+    // Удаление заметки
     if (elements.noteDeleteBtn) {
         elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     }
 
+    // Счётчик символов в заметке
     elements.noteInput?.addEventListener('input', (e) => {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
+    // Выбор настроения внутри модалки заметки
     elements.noteMoodOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
@@ -186,6 +212,7 @@ function setupModalControls() {
         });
     });
 
+    // Закрытие модалки при клике на фон
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
@@ -235,7 +262,7 @@ function applyTheme(isDark) {
     }
 }
 
-// ==================== НАСТРОЕНИЕ (ОБНОВЛЕНО) ====================
+// ==================== НАСТРОЕНИЕ ====================
 function setMood(mood) {
     state.currentMood = mood;
     saveData();
@@ -390,7 +417,7 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
-// ==================== КАЛЕНДАРЬ ====================
+// ==================== КАЛЕНДАРЬ (ОБНОВЛЕНО) ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -402,8 +429,9 @@ function renderCalendar() {
         elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     }
 
+    // Находим понедельник этой недели
     const monday = new Date(currentDate);
-    const day = monday.getDay();
+    const day = monday.getDay(); // 0 = воскресенье, 1 = понедельник, ...
     const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
     monday.setDate(diff);
 
@@ -420,15 +448,25 @@ function renderCalendar() {
             <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
         `;
 
+        // Отмечаем сегодняшний день
         if (isSameDay(date, today)) btn.classList.add('today');
+
+        // Отмечаем выбранный день
         if (state.selectedDate && isSameDay(date, state.selectedDate)) btn.classList.add('selected');
 
+        // Отмечаем дни с заметками
         const hasNote = state.notes.some(note => {
             try { return isSameDay(new Date(note.date), date); } catch { return false; }
         });
         if (hasNote) btn.classList.add('has-note');
 
+        // Дни из другого месяца
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
+
+        // НОВОЕ: выделяем выходные (суббота и воскресенье)
+        if (i === 5 || i === 6) { // индексы 5 и 6 соответствуют сб и вс
+            btn.classList.add('weekend-number');
+        }
 
         const dateCopy = new Date(date);
         btn.addEventListener('click', (e) => {
@@ -480,6 +518,7 @@ function renderNotes() {
                 </div>`;
     }).join('');
 
+    // Клик по карточке заметки открывает её для редактирования
     document.querySelectorAll('.note-card').forEach(card => {
         card.addEventListener('click', function () {
             const id = parseInt(this.dataset.id);
