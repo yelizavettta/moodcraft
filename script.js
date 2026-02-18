@@ -502,9 +502,8 @@ function renderNotes() {
     '', 
     '<img src="images/mood1.png" class="note-mood-img" alt="Плохо">',
     '<img src="images/mood2.png" class="note-mood-img" alt="Не очень">',
-    '<img src="images/mood3.png" class="note-mood-img" alt="Нормально">',
-    '<img src="images/mood4.png" class="note-mood-img" alt="Хорошо">',
-    '<img src="images/mood5.png" class="note-mood-img" alt="Отлично!">'
+    '<img src="images/mood4.png" class="note-mood-img" alt="Нормально">',
+    '<img src="images/mood5.png" class="note-mood-img" alt="Хорошо!">'
     ];
 
     elements.notesList.innerHTML = filtered.map(note => {
@@ -745,5 +744,6 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
 
 
