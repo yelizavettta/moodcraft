@@ -235,12 +235,17 @@ function applyTheme(isDark) {
     }
 }
 
+// ==================== НАСТРОЕНИЕ (ОБНОВЛЕНО) ====================
 function setMood(mood) {
     state.currentMood = mood;
     saveData();
-    showToast('Настроение сохранено');
+
+    // Массив названий настроений для тоста
+    const moodNames = ['', 'Плохо', 'Не очень', 'Нормально', 'Хорошо', 'Отлично!'];
+    showToast(`Выбрано настроение: ${moodNames[mood]}`);
 }
 
+// ==================== ПРИВЫЧКИ ====================
 function getTodayString() {
     return new Date().toISOString().split('T')[0];
 }
@@ -330,6 +335,7 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
+// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
 function render() {
     renderHabits();
     updateStats();
@@ -384,6 +390,7 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
+// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -441,6 +448,7 @@ function isSameDay(date1, date2) {
            date1.getFullYear() === date2.getFullYear();
 }
 
+// ==================== ЗАМЕТКИ ====================
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
@@ -565,6 +573,7 @@ function deleteCurrentNote() {
     }
 }
 
+// ==================== ПРАКТИКИ ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -615,12 +624,14 @@ function renderPracticeContent() {
     }
 }
 
+// ==================== АККАУНТ ====================
 function renderAccountStats() {
     if (elements.accountStatStreak) elements.accountStatStreak.textContent = state.streak;
     if (elements.accountStatHabits) elements.accountStatHabits.textContent = state.habits.length;
     if (elements.accountStatNotes) elements.accountStatNotes.textContent = state.notes.length;
 }
 
+// ==================== МОДАЛЬНЫЕ ОКНА ====================
 function showModal(modalId) {
     document.getElementById(modalId)?.classList.add('active');
 }
@@ -628,6 +639,7 @@ function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
 }
 
+// ==================== TOAST ====================
 function showToast(message) {
     if (tg?.showAlert) {
         tg.showAlert(message);
@@ -645,6 +657,7 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2000);
 }
 
+// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ====================
 function saveData() {
     const data = {
         habits: state.habits,
@@ -683,5 +696,6 @@ function loadData() {
     }
 }
 
+// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
