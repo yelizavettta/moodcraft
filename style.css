@@ -1,4 +1,4 @@
-/* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ (СВЕТЛАЯ ТЕМА) ===== */
+/* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ===== */
 :root {
     --bg-primary: #f2f2f2;
     --bg-secondary: #ffffff;
@@ -24,7 +24,7 @@
     --font-main: 'Inter', sans-serif;
 }
 
-/* ===== ТЁМНАЯ ТЕМА (ЧЁРНО-СЕРАЯ) ===== */
+/* ===== ТЁМНАЯ ТЕМА ===== */
 .dark-theme {
     --bg-primary: #121212;
     --bg-secondary: #1e1e1e;
@@ -201,7 +201,7 @@ body {
     color: var(--accent);
 }
 
-/* ===== НАСТРОЕНИЕ ===== */
+/* ===== НАСТРОЕНИЕ (ОБНОВЛЕНО) ===== */
 .mood-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -210,7 +210,7 @@ body {
 
 .mood-btn {
     background: var(--bg-card);
-    border: 2px solid var(--border);
+    border: none;                       /* убрали рамку */
     border-radius: var(--radius-xl);
     padding: 16px 4px;
     display: flex;
@@ -227,7 +227,6 @@ body {
 }
 
 .mood-btn.active {
-    border-color: var(--accent);
     background: var(--accent-soft);
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
@@ -238,7 +237,7 @@ body {
 }
 
 .mood-emoji {
-    font-size: 30px;
+    font-size: 36px;                    /* увеличили */
 }
 
 .mood-label {
@@ -660,7 +659,6 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-/* ===== ИСПРАВЛЕНО: скрываем неактивные вкладки ===== */
 .tab-content {
     display: none;
 }
@@ -671,7 +669,7 @@ body {
 .videos-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px; /* увеличено для лучшего расстояния */
+    gap: 24px;
 }
 
 .video-card {
@@ -949,20 +947,11 @@ input:checked + .slider:before {
     width: 100%;
     max-width: 400px;
     max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     animation: slideUp 0.3s ease;
     border: 1px solid var(--border);
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .modal-header {
@@ -971,6 +960,7 @@ input:checked + .slider:before {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -991,6 +981,8 @@ input:checked + .slider:before {
 
 .modal-body {
     padding: 24px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .modal-input,
@@ -1035,6 +1027,7 @@ input:checked + .slider:before {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
+    flex-shrink: 0;
 }
 
 .btn {
@@ -1064,7 +1057,7 @@ input:checked + .slider:before {
     border: none;
 }
 
-/* ===== УВЕДОМЛЕНИЯ (TOAST) ===== */
+/* ===== УВЕДОМЛЕНИЯ ===== */
 @keyframes fadeInOut {
     0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
     10% { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -1076,7 +1069,7 @@ input:checked + .slider:before {
     display: none !important;
 }
 
-/* ===== АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ ===== */
+/* ===== АДАПТАЦИЯ ===== */
 @media (max-width: 380px) {
     .app-content {
         padding: 20px;
@@ -1087,7 +1080,7 @@ input:checked + .slider:before {
     }
 
     .mood-emoji {
-        font-size: 26px;
+        font-size: 30px;
     }
 
     .habit-icon {
