@@ -5,29 +5,28 @@
 // =====================================================
 
 // ==================== РАБОТА С TELEGRAM ====================
-const tg = window.Telegram?.WebApp;          // Объект Telegram Web App
-let tgUser = null;                           // Данные пользователя из Telegram
+const tg = window.Telegram?.WebApp;
+let tgUser = null;
 if (tg) {
-    tg.expand();                              // Растягиваем на весь экран
-    tg.enableClosingConfirmation();            // Подтверждение при закрытии
-    tgUser = tg.initDataUnsafe?.user;          // Получаем информацию о юзере
+    tg.expand();
+    tg.enableClosingConfirmation();
+    tgUser = tg.initDataUnsafe?.user;
 }
 
-// ==================== ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ ====================
+// ==================== ГЛОБАЛЬНОЕ СОСТОЯНИЕ ====================
 const state = {
-    habits: [],                                // Список привычек
-    notes: [],                                 // Заметки
-    currentMood: null,                          // Текущее настроение (1-5)
-    streak: 0,                                  // Общая серия дней
-    currentPage: 'home',                         // Активная страница (home, diary, practice, account)
-    currentWeek: 0,                              // Смещение недели для календаря
-    selectedDate: new Date(),                    // Выбранная дата в календаре
-    editingNoteId: null,                          // ID заметки, которую редактируем (null если новая)
-    darkTheme: false                              // Флаг тёмной темы
+    habits: [],
+    notes: [],
+    currentMood: null,
+    streak: 0,
+    currentPage: 'home',
+    currentWeek: 0,
+    selectedDate: new Date(),
+    editingNoteId: null,
+    darkTheme: false
 };
 
-// ==================== ССЫЛКИ НА DOM-ЭЛЕМЕНТЫ ====================
-// Чтобы не писать document.getElementById каждый раз
+// ==================== ССЫЛКИ НА DOM ====================
 const elements = {
     welcomeCard: document.getElementById('welcome-card'),
     moodSection: document.getElementById('mood-section'),
@@ -72,26 +71,24 @@ const elements = {
     greeting: document.getElementById('greeting'),
     currentDate: document.getElementById('current-date'),
 
-    // Элементы для выбора настроения в модалке заметки
     noteMoodOptions: document.querySelectorAll('.mood-option'),
     noteDeleteBtn: document.getElementById('note-delete-btn')
 };
 
-// ==================== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ====================
+// ==================== ИНИЦИАЛИЗАЦИЯ ====================
 document.addEventListener('DOMContentLoaded', initApp);
 
 function initApp() {
-    loadData();                               // Загружаем данные из localStorage
-    applyTheme(state.darkTheme);                // Применяем сохранённую тему
-    setupGreeting();                            // Устанавливаем приветствие
-    setupEventListeners();                       // Вешаем обработчики событий
-    render();                                    // Отрисовываем главную страницу
-    renderPracticeContent();                     // Заполняем раздел практик
-    renderAccountStats();                        // Обновляем статистику в аккаунте
-    switchPage('home');                          // Показываем главную страницу
+    loadData();
+    applyTheme(state.darkTheme);
+    setupGreeting();
+    setupEventListeners();
+    render();
+    renderPracticeContent();
+    renderAccountStats();
+    switchPage('home');
 }
 
-// ==================== ПРИВЕТСТВИЕ И ДАТА ====================
 function setupGreeting() {
     const now = new Date();
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
@@ -102,9 +99,7 @@ function setupGreeting() {
     if (elements.accountName) elements.accountName.textContent = name;
 }
 
-// ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
 function setupEventListeners() {
-    // Переключение страниц через нижнее меню
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -114,7 +109,6 @@ function setupEventListeners() {
         });
     });
 
-    // Выбор настроения на главной
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -124,7 +118,6 @@ function setupEventListeners() {
         });
     });
 
-    // Кнопка добавления привычки
     if (elements.addHabitBtn) {
         elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
@@ -132,7 +125,6 @@ function setupEventListeners() {
         });
     }
 
-    // Переключение недели в календаре
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -144,16 +136,10 @@ function setupEventListeners() {
         });
     }
 
-    // Поиск по заметкам
     elements.searchNotes?.addEventListener('input', renderNotes);
-
-    // Управление модальными окнами
     setupModalControls();
-
-    // Вкладки в разделе практик
     setupPracticeTabs();
 
-    // Переключение тёмной темы
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -163,23 +149,18 @@ function setupEventListeners() {
     }
 }
 
-// ==================== УПРАВЛЕНИЕ МОДАЛКАМИ ====================
 function setupModalControls() {
-    // Закрытие модалки привычки по крестику или кнопке "Отмена"
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
             if (elements.habitInput) elements.habitInput.value = '';
         });
     });
-    // Сохранение привычки
     document.getElementById('save-btn')?.addEventListener('click', saveHabit);
-    // Сохранение по Enter
     elements.habitInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') saveHabit();
     });
 
-    // Закрытие модалки заметки
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -188,20 +169,16 @@ function setupModalControls() {
         });
     });
 
-    // Сохранение заметки
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
 
-    // Удаление заметки
     if (elements.noteDeleteBtn) {
         elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     }
 
-    // Счётчик символов в заметке
     elements.noteInput?.addEventListener('input', (e) => {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
-    // Выбор настроения внутри модалки заметки
     elements.noteMoodOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
@@ -209,7 +186,6 @@ function setupModalControls() {
         });
     });
 
-    // Закрытие модалки при клике на фон
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
@@ -217,7 +193,6 @@ function setupModalControls() {
     });
 }
 
-// ==================== НАВИГАЦИЯ ПО СТРАНИЦАМ ====================
 function switchPage(page) {
     state.currentPage = page;
 
@@ -249,7 +224,6 @@ function switchPage(page) {
     }
 }
 
-// ==================== ТЁМНАЯ ТЕМА ====================
 function applyTheme(isDark) {
     if (isDark) {
         document.body.classList.add('dark-theme');
@@ -261,14 +235,12 @@ function applyTheme(isDark) {
     }
 }
 
-// ==================== НАСТРОЕНИЕ ====================
 function setMood(mood) {
     state.currentMood = mood;
     saveData();
     showToast('Настроение сохранено');
 }
 
-// ==================== ПРИВЫЧКИ ====================
 function getTodayString() {
     return new Date().toISOString().split('T')[0];
 }
@@ -358,7 +330,6 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
-// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
 function render() {
     renderHabits();
     updateStats();
@@ -413,7 +384,6 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
-// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -471,7 +441,6 @@ function isSameDay(date1, date2) {
            date1.getFullYear() === date2.getFullYear();
 }
 
-// ==================== ЗАМЕТКИ ====================
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
@@ -483,7 +452,7 @@ function renderNotes() {
         return;
     }
 
-    const moodEmojis = ['', '😢', '😔', '😐', '🙂', '😊'];
+    const moodEmojis = ['', '😭', '😩', '😐', '✨', '🤩'];
 
     elements.notesList.innerHTML = filtered.map(note => {
         const date = new Date(note.date);
@@ -596,7 +565,6 @@ function deleteCurrentNote() {
     }
 }
 
-// ==================== ПРАКТИКИ ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -647,14 +615,12 @@ function renderPracticeContent() {
     }
 }
 
-// ==================== АККАУНТ ====================
 function renderAccountStats() {
     if (elements.accountStatStreak) elements.accountStatStreak.textContent = state.streak;
     if (elements.accountStatHabits) elements.accountStatHabits.textContent = state.habits.length;
     if (elements.accountStatNotes) elements.accountStatNotes.textContent = state.notes.length;
 }
 
-// ==================== МОДАЛЬНЫЕ ОКНА ====================
 function showModal(modalId) {
     document.getElementById(modalId)?.classList.add('active');
 }
@@ -662,7 +628,6 @@ function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
 }
 
-// ==================== TOAST ====================
 function showToast(message) {
     if (tg?.showAlert) {
         tg.showAlert(message);
@@ -680,7 +645,6 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2000);
 }
 
-// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ====================
 function saveData() {
     const data = {
         habits: state.habits,
@@ -719,6 +683,5 @@ function loadData() {
     }
 }
 
-// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
