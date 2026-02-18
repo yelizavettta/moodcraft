@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', initApp);
 
 function initApp() {
     loadData();
+    handleStartParam();  // <-- Обрабатываем параметр запуска (команды бота)
     applyTheme(state.darkTheme);
     setupGreeting();
     setupEventListeners();
@@ -87,6 +88,49 @@ function initApp() {
     renderPracticeContent();
     renderAccountStats();
     switchPage('home');
+}
+
+// ==================== ОБРАБОТКА ПАРАМЕТРА ЗАПУСКА (КОМАНДЫ БОТА) ====================
+function handleStartParam() {
+    const startParam = tg?.initDataUnsafe?.start_param;
+    if (!startParam) return;
+
+    console.log('Start param:', startParam); // для отладки
+
+    switch (startParam) {
+        case 'today':
+            // Открываем главную (там уже отображаются привычки на сегодня)
+            switchPage('home');
+            break;
+
+        case 'start':
+        case 'home':
+            switchPage('home');
+            break;
+
+        case 'diary':
+            // Открываем дневник
+            switchPage('diary');
+            break;
+
+        case 'add':
+            // Открываем главную и сразу модалку добавления привычки
+            switchPage('home');
+            // Небольшая задержка, чтобы страница успела отрисоваться
+            setTimeout(() => showModal('habit-modal'), 300);
+            break;
+
+        case 'note':
+            // Открываем дневник, устанавливаем сегодняшнюю дату и открываем модалку заметки
+            switchPage('diary');
+            state.selectedDate = new Date(); // выбираем сегодня
+            setTimeout(() => openNoteModal(), 300);
+            break;
+
+        default:
+            // Если параметр неизвестен – просто главная
+            switchPage('home');
+    }
 }
 
 function setupGreeting() {
@@ -744,6 +788,3 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
-
-
-
