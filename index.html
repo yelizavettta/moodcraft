@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Наш CSS -->
     <link rel="stylesheet" href="style.css">
-    <meta name="theme-color" content="#027368">
+    <meta name="theme-color" content="#CC8B7A">
 </head>
 <body>
     <div id="app">
@@ -38,7 +38,7 @@
                 </div>
             </section>
 
-            <!-- НАСТРОЕНИЕ (только эмодзи, без подписей, без фона) -->
+            <!-- НАСТРОЕНИЕ -->
             <section class="mood-section hidden" id="mood-section">
                 <h3 class="section-title">Твоё настроение</h3>
                 <div class="mood-grid">
@@ -86,14 +86,11 @@
             </section>
 
             <!-- ДНЕВНИК -->
-            <!-- ДНЕВНИК -->
             <section class="diary-section hidden" id="diary-section">
                 <h3 class="section-title">Дневник</h3>
-                <!-- Поиск заметок теперь сверху -->
                 <div class="notes-search">
                     <input type="text" id="search-notes" placeholder="Поиск заметок..." class="search-input">
                 </div>
-                <!-- Календарь под поиском -->
                 <div class="calendar">
                     <div class="calendar-header">
                         <button id="prev-week"><i class="fas fa-chevron-left"></i></button>
@@ -158,7 +155,7 @@
                     </div>
                     <div class="setting-item">
                         <span class="setting-label"><i class="fas fa-info-circle"></i> О приложении</span>
-                        <span style="color: var(--text-tertiary);">v1.3.0</span>
+                        <span style="color: var(--text-tertiary);">v1.4.0</span>
                     </div>
                 </div>
             </section>
@@ -173,7 +170,7 @@
         </nav>
     </div>
 
-    <!-- Модальное окно для новой привычки -->
+    <!-- Модальное окно для новой привычки (ДОБАВЛЕНО ПОЛЕ ОПИСАНИЯ) -->
     <div class="modal" id="habit-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -182,6 +179,8 @@
             </div>
             <div class="modal-body">
                 <input type="text" id="habit-input" placeholder="Название привычки" maxlength="30" class="modal-input">
+                <!-- Новое поле: описание привычки -->
+                <input type="text" id="habit-desc" placeholder="Описание (например, 15 мин)" maxlength="50" class="modal-input">
                 <div class="modal-actions">
                     <button class="btn secondary" id="cancel-btn">Отмена</button>
                     <button class="btn primary" id="save-btn">Сохранить</button>
@@ -223,8 +222,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
