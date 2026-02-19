@@ -1,7 +1,6 @@
 // =====================================================
 // MoodCraft — Telegram Mini App
 // Основной файл с логикой приложения
-// Комментарии написаны простым языком, чтобы было понятно
 // =====================================================
 
 // ==================== РАБОТА С TELEGRAM ====================
@@ -60,6 +59,7 @@ const elements = {
     habitModal: document.getElementById('habit-modal'),
     noteModal: document.getElementById('note-modal'),
     habitInput: document.getElementById('habit-input'),
+    habitDesc: document.getElementById('habit-desc'), // новое поле описания
     noteInput: document.getElementById('note-input'),
     charCount: document.getElementById('char-count'),
 
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', initApp);
 
 function initApp() {
     loadData();
-    handleStartParam();  // <-- Обрабатываем параметр запуска (команды бота)
+    handleStartParam();
     applyTheme(state.darkTheme);
     setupGreeting();
     setupEventListeners();
@@ -90,45 +90,32 @@ function initApp() {
     switchPage('home');
 }
 
-// ==================== ОБРАБОТКА ПАРАМЕТРА ЗАПУСКА (КОМАНДЫ БОТА) ====================
+// ==================== ОБРАБОТКА ПАРАМЕТРА ЗАПУСКА ====================
 function handleStartParam() {
     const startParam = tg?.initDataUnsafe?.start_param;
     if (!startParam) return;
 
-    console.log('Start param:', startParam); // для отладки
+    console.log('Start param:', startParam);
 
     switch (startParam) {
         case 'today':
-            // Открываем главную (там уже отображаются привычки на сегодня)
-            switchPage('home');
-            break;
-
         case 'start':
         case 'home':
             switchPage('home');
             break;
-
         case 'diary':
-            // Открываем дневник
             switchPage('diary');
             break;
-
         case 'add':
-            // Открываем главную и сразу модалку добавления привычки
             switchPage('home');
-            // Небольшая задержка, чтобы страница успела отрисоваться
-            setTimeout(() => showModal('habit-modal'), 300);
+            setTimeout(() => showModal('habit-modal'), 400);
             break;
-
         case 'note':
-            // Открываем дневник, устанавливаем сегодняшнюю дату и открываем модалку заметки
             switchPage('diary');
-            state.selectedDate = new Date(); // выбираем сегодня
-            setTimeout(() => openNoteModal(), 300);
+            state.selectedDate = new Date();
+            setTimeout(() => openNoteModal(), 400);
             break;
-
         default:
-            // Если параметр неизвестен – просто главная
             switchPage('home');
     }
 }
@@ -202,7 +189,7 @@ function setupEventListeners() {
         });
     }
 
-    // НОВОЕ: Скрытие клавиатуры при клике вне поля поиска
+    // Скрытие клавиатуры при клике вне поля поиска
     document.addEventListener('click', function(e) {
         const searchInput = elements.searchNotes;
         if (searchInput && !searchInput.contains(e.target)) {
@@ -212,11 +199,12 @@ function setupEventListeners() {
 }
 
 function setupModalControls() {
-    // Закрытие модалки привычки по крестику или кнопке "Отмена"
+    // Закрытие модалки привычки
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
             if (elements.habitInput) elements.habitInput.value = '';
+            if (elements.habitDesc) elements.habitDesc.value = '';
         });
     });
     // Сохранение привычки
@@ -311,9 +299,8 @@ function setMood(mood) {
     state.currentMood = mood;
     saveData();
 
-    // Массив названий настроений для тоста
     const moodNames = ['', 'Плохо', 'Не очень', 'Нормально', 'Хорошо', 'Отлично!'];
-    showToast(`Выбрано настроение: ${moodNames[mood]}`);
+    showToast(moodNames[mood]); // всегда используем автоматический тост
 }
 
 // ==================== ПРИВЫЧКИ ====================
@@ -324,7 +311,8 @@ function getTodayString() {
 function migrateHabits(habits) {
     return habits.map(habit => ({
         ...habit,
-        completedDates: habit.completedDates || (habit.completed ? [getTodayString()] : [])
+        completedDates: habit.completedDates || (habit.completed ? [getTodayString()] : []),
+        description: habit.description || '' // добавляем поле описания для старых данных
     }));
 }
 
@@ -392,15 +380,18 @@ function saveHabit() {
         showToast('Введите название привычки');
         return;
     }
+    const description = elements.habitDesc?.value.trim() || '';
     const newHabit = {
         id: Date.now(),
         title,
+        description, // сохраняем описание
         completedDates: [],
         createdAt: new Date().toISOString()
     };
     state.habits.push(newHabit);
     hideModal('habit-modal');
     if (elements.habitInput) elements.habitInput.value = '';
+    if (elements.habitDesc) elements.habitDesc.value = '';
     saveData();
     render();
     showToast('Привычка добавлена');
@@ -435,6 +426,7 @@ function renderHabits() {
                     <div class="habit-icon">${completed ? '✅' : '📌'}</div>
                     <div class="habit-text">
                         <h4>${habit.title}</h4>
+                        ${habit.description ? `<div class="habit-description">${habit.description}</div>` : ''}
                         <p>Выполнено дней: ${habit.completedDates.length}</p>
                     </div>
                 </div>
@@ -461,7 +453,7 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
-// ==================== КАЛЕНДАРЬ (ОБНОВЛЕНО) ====================
+// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -507,14 +499,17 @@ function renderCalendar() {
         // Дни из другого месяца
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
 
-        // НОВОЕ: выделяем выходные (суббота и воскресенье)
-        if (i === 5 || i === 6) { // индексы 5 и 6 соответствуют сб и вс
-            btn.classList.add('weekend-number');
-        }
+        // Выделяем выходные
+        if (i === 5 || i === 6) btn.classList.add('weekend-number');
 
         const dateCopy = new Date(date);
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
+            // Запрет на будущие даты (только сегодня и прошлые)
+            if (dateCopy > new Date()) {
+                showToast('Заметки заранее недоступны');
+                return;
+            }
             state.selectedDate = dateCopy;
             renderCalendar();
             openNoteModal();
@@ -543,11 +538,11 @@ function renderNotes() {
     }
 
     const moodEmojis = [
-    '', 
-    '<img src="images/mood1.png" class="note-mood-img" alt="Плохо">',
-    '<img src="images/mood2.png" class="note-mood-img" alt="Не очень">',
-    '<img src="images/mood4.png" class="note-mood-img" alt="Нормально">',
-    '<img src="images/mood5.png" class="note-mood-img" alt="Хорошо!">'
+        '', 
+        '<img src="images/mood1.png" class="note-mood-img" alt="Плохо">',
+        '<img src="images/mood2.png" class="note-mood-img" alt="Не очень">',
+        '<img src="images/mood4.png" class="note-mood-img" alt="Нормально">',
+        '<img src="images/mood5.png" class="note-mood-img" alt="Хорошо!">'
     ];
 
     elements.notesList.innerHTML = filtered.map(note => {
@@ -583,6 +578,12 @@ function renderNotes() {
 }
 
 function openNoteModal(note = null) {
+    // Проверка на будущую дату (если открываем через кнопку или команду, дата уже выбрана)
+    if (state.selectedDate > new Date()) {
+        showToast('Заметки заранее недоступны');
+        return;
+    }
+
     if (elements.noteInput) elements.noteInput.value = note ? note.text : '';
     if (elements.charCount) elements.charCount.textContent = `${elements.noteInput?.value.length || 0}/1000`;
 
@@ -728,12 +729,9 @@ function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
 }
 
-// ==================== TOAST ====================
+// ==================== TOAST (автоматическое исчезновение) ====================
 function showToast(message) {
-    if (tg?.showAlert) {
-        tg.showAlert(message);
-        return;
-    }
+    // Всегда используем кастомный тост, без alert
     const toast = document.createElement('div');
     toast.textContent = message;
     toast.style.cssText = `
@@ -741,6 +739,7 @@ function showToast(message) {
         background: var(--text-primary); color: var(--bg-primary);
         padding: 12px 24px; border-radius: 40px; font-size: 14px;
         z-index: 1000; animation: fadeInOut 2s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     `;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
