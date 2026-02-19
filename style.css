@@ -364,7 +364,6 @@ body {
     color: var(--text-tertiary);
 }
 
-/* Новый стиль для описания привычки */
 .habit-description {
     font-size: 12px;
     color: var(--text-secondary);
@@ -641,7 +640,6 @@ body {
     overflow: hidden;
 }
 
-/* Увеличенный размер эмодзи в заметках */
 .note-mood-img {
     width: 40px;
     height: 40px;
@@ -719,15 +717,23 @@ body {
 }
 
 .video-thumbnail {
-    width: 90px;
+    width: 120px;
     height: 90px;
     background: var(--accent-soft);
-    border-radius: 50%;
+    border-radius: 8px; /* прямоугольные со скруглением */
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--accent);
     font-size: 36px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .video-info {
@@ -757,6 +763,8 @@ body {
     font-size: 13px;
     font-weight: 700;
     transition: opacity 0.2s;
+    border: none;
+    cursor: pointer;
 }
 
 .video-link:active {
@@ -1129,7 +1137,7 @@ input:checked + .slider:before {
 
     .video-thumbnail {
         width: 100px;
-        height: 100px;
+        height: 75px;
     }
 
     .account-header {
@@ -1137,7 +1145,6 @@ input:checked + .slider:before {
         text-align: center;
     }
 
-    /* Уменьшаем эмодзи в заметках на маленьких экранах */
     .note-mood-img {
         width: 32px;
         height: 32px;
