@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MoodCraft</title>
     <!-- Telegram Web App -->
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Font Awesome и Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,7 +38,7 @@
                 </div>
             </section>
 
-            <!-- НАСТРОЕНИЕ -->
+            <!-- НАСТРОЕНИЕ (ИСПРАВЛЕНО) -->
             <section class="mood-section hidden" id="mood-section">
                 <h3 class="section-title">Твоё настроение</h3>
                 <div class="mood-grid">
@@ -49,11 +48,11 @@
                     <button class="mood-btn" data-mood="2">
                         <img src="images/not_good.png" alt="Не очень" class="mood-emoji">
                     </button>
-                    <button class="mood-btn" data-mood="4">
-                        <img src="images/good.png" alt="Нормально" class="mood-emoji">
+                    <button class="mood-btn" data-mood="3">
+                        <img src="images/good.png" alt="Хорошо" class="mood-emoji">
                     </button>
-                    <button class="mood-btn" data-mood="5">
-                        <img src="images/great.png" alt="Хорошо" class="mood-emoji">
+                    <button class="mood-btn" data-mood="4">
+                        <img src="images/great.png" alt="Отлично" class="mood-emoji">
                     </button>
                 </div>
             </section>
@@ -171,7 +170,7 @@
         </nav>
     </div>
 
-    <!-- Модальное окно для новой привычки (ДОБАВЛЕНО ПОЛЕ ОПИСАНИЯ) -->
+    <!-- Модальное окно для новой привычки -->
     <div class="modal" id="habit-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -180,7 +179,6 @@
             </div>
             <div class="modal-body">
                 <input type="text" id="habit-input" placeholder="Название привычки" maxlength="30" class="modal-input">
-                <!-- Новое поле: описание привычки -->
                 <input type="text" id="habit-desc" placeholder="Описание (например, 15 мин)" maxlength="50" class="modal-input">
                 <div class="modal-actions">
                     <button class="btn secondary" id="cancel-btn">Отмена</button>
@@ -223,6 +221,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
