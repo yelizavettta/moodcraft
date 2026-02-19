@@ -72,7 +72,15 @@ const elements = {
     currentDate: document.getElementById('current-date'),
 
     noteMoodOptions: document.querySelectorAll('.mood-option'),
-    noteDeleteBtn: document.getElementById('note-delete-btn')
+    noteDeleteBtn: document.getElementById('note-delete-btn'),
+
+    // Новые элементы для видео
+    videoModal: document.getElementById('video-modal'),
+    videoPlayer: document.getElementById('video-player'),
+    videoModalTitle: document.getElementById('video-modal-title'),
+    watchOnYoutubeBtn: document.getElementById('watch-on-youtube'),
+    closeVideoModalBtn: document.getElementById('close-video-modal'),
+    closeVideoBtn: document.getElementById('close-video-btn')
 };
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
@@ -113,7 +121,14 @@ function handleStartParam() {
         case 'note':
             switchPage('diary');
             state.selectedDate = new Date();
-            setTimeout(() => openNoteModal(), 400);
+            // Проверяем, есть ли заметка на сегодня
+            const todayNote = state.notes.find(n => isSameDay(new Date(n.date), new Date()));
+            if (todayNote) {
+                state.editingNoteId = todayNote.id;
+                setTimeout(() => openNoteModal(todayNote), 400);
+            } else {
+                setTimeout(() => openNoteModal(), 400);
+            }
             break;
         default:
             switchPage('home');
@@ -131,6 +146,7 @@ function setupGreeting() {
 }
 
 function setupEventListeners() {
+    // Переключение страниц через нижнее меню
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -140,6 +156,7 @@ function setupEventListeners() {
         });
     });
 
+    // Выбор настроения на главной
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -149,6 +166,7 @@ function setupEventListeners() {
         });
     });
 
+    // Кнопка добавления привычки
     if (elements.addHabitBtn) {
         elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
@@ -156,6 +174,7 @@ function setupEventListeners() {
         });
     }
 
+    // Переключение недели в календаре
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -167,10 +186,16 @@ function setupEventListeners() {
         });
     }
 
+    // Поиск по заметкам
     elements.searchNotes?.addEventListener('input', renderNotes);
+
+    // Управление модальными окнами
     setupModalControls();
+
+    // Вкладки в разделе практик
     setupPracticeTabs();
 
+    // Переключение тёмной темы
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -179,6 +204,7 @@ function setupEventListeners() {
         });
     }
 
+    // Скрытие клавиатуры при клике вне поля поиска
     document.addEventListener('click', function(e) {
         const searchInput = elements.searchNotes;
         if (searchInput && !searchInput.contains(e.target)) {
@@ -188,6 +214,7 @@ function setupEventListeners() {
 }
 
 function setupModalControls() {
+    // Закрытие модалки привычки
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
@@ -195,11 +222,14 @@ function setupModalControls() {
             if (elements.habitDesc) elements.habitDesc.value = '';
         });
     });
+    // Сохранение привычки
     document.getElementById('save-btn')?.addEventListener('click', saveHabit);
+    // Сохранение по Enter
     elements.habitInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') saveHabit();
     });
 
+    // Закрытие модалки заметки
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -208,16 +238,20 @@ function setupModalControls() {
         });
     });
 
+    // Сохранение заметки
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
 
+    // Удаление заметки
     if (elements.noteDeleteBtn) {
         elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     }
 
+    // Счётчик символов в заметке
     elements.noteInput?.addEventListener('input', (e) => {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
+    // Выбор настроения внутри модалки заметки
     elements.noteMoodOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
@@ -225,11 +259,26 @@ function setupModalControls() {
         });
     });
 
+    // Закрытие модалки при клике на фон
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
         });
     });
+
+    // ----- Видео-модалка -----
+    if (elements.closeVideoModalBtn) {
+        elements.closeVideoModalBtn.addEventListener('click', () => hideModal('video-modal'));
+    }
+    if (elements.closeVideoBtn) {
+        elements.closeVideoBtn.addEventListener('click', () => hideModal('video-modal'));
+    }
+    if (elements.watchOnYoutubeBtn) {
+        elements.watchOnYoutubeBtn.addEventListener('click', () => {
+            const url = elements.watchOnYoutubeBtn.dataset.url;
+            if (url) window.open(url, '_blank');
+        });
+    }
 }
 
 function switchPage(page) {
@@ -377,6 +426,7 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
+// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
 function render() {
     renderHabits();
     updateStats();
@@ -432,6 +482,7 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
+// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -443,8 +494,9 @@ function renderCalendar() {
         elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     }
 
+    // Находим понедельник этой недели
     const monday = new Date(currentDate);
-    const day = monday.getDay();
+    const day = monday.getDay(); // 0 = воскресенье, 1 = понедельник, ...
     const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
     monday.setDate(diff);
 
@@ -461,15 +513,22 @@ function renderCalendar() {
             <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
         `;
 
+        // Отмечаем сегодняшний день
         if (isSameDay(date, today)) btn.classList.add('today');
+
+        // Отмечаем выбранный день
         if (state.selectedDate && isSameDay(date, state.selectedDate)) btn.classList.add('selected');
 
+        // Отмечаем дни с заметками
         const hasNote = state.notes.some(note => {
             try { return isSameDay(new Date(note.date), date); } catch { return false; }
         });
         if (hasNote) btn.classList.add('has-note');
 
+        // Дни из другого месяца
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
+
+        // Выделяем выходные
         if (i === 5 || i === 6) btn.classList.add('weekend-number');
 
         const dateCopy = new Date(date);
@@ -479,9 +538,16 @@ function renderCalendar() {
                 showToast('Заметки заранее недоступны');
                 return;
             }
-            state.selectedDate = dateCopy;
-            renderCalendar();
-            openNoteModal();
+            // Ищем существующую заметку для этой даты
+            const existingNote = state.notes.find(n => isSameDay(new Date(n.date), dateCopy));
+            if (existingNote) {
+                state.editingNoteId = existingNote.id;
+                state.selectedDate = dateCopy;
+                openNoteModal(existingNote);
+            } else {
+                state.selectedDate = dateCopy;
+                openNoteModal();
+            }
         });
         elements.weekDates.appendChild(btn);
     }
@@ -494,6 +560,7 @@ function isSameDay(date1, date2) {
            date1.getFullYear() === date2.getFullYear();
 }
 
+// ==================== ЗАМЕТКИ ====================
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
@@ -531,6 +598,7 @@ function renderNotes() {
                 </div>`;
     }).join('');
 
+    // Клик по карточке заметки открывает её для редактирования
     document.querySelectorAll('.note-card').forEach(card => {
         card.addEventListener('click', function () {
             const id = parseInt(this.dataset.id);
@@ -545,7 +613,8 @@ function renderNotes() {
 }
 
 function openNoteModal(note = null) {
-    if (state.selectedDate > new Date()) {
+    // Проверка на будущую дату (только для новых заметок)
+    if (!note && state.selectedDate > new Date()) {
         showToast('Заметки заранее недоступны');
         return;
     }
@@ -629,6 +698,7 @@ function deleteCurrentNote() {
     }
 }
 
+// ==================== ПРАКТИКИ ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -643,55 +713,98 @@ function setupPracticeTabs() {
 }
 
 function renderPracticeContent() {
+    // Примеры видео с реальными ID (можно заменить на свои)
     const workouts = [
-        { title: 'Утренняя зарядка', duration: '10 мин', url: '#', thumb: '🏋️' },
-        { title: 'Йога для начинающих', duration: '20 мин', url: '#', thumb: '🧘' },
-        { title: 'Кардио дома', duration: '15 мин', url: '#', thumb: '🔥' }
+        { title: 'Утренняя зарядка', duration: '10 мин', videoId: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
+        { title: 'Йога для начинающих', duration: '20 мин', videoId: 'p3S--c29D-8', thumb: 'https://img.youtube.com/vi/p3S--c29D-8/hqdefault.jpg' },
+        { title: 'Кардио дома', duration: '15 мин', videoId: 'ml6cT4AZdqI', thumb: 'https://img.youtube.com/vi/ml6cT4AZdqI/hqdefault.jpg' }
     ];
     const meditations = [
-        { title: 'Осознанное дыхание', duration: '5 мин', url: '#', thumb: '🌿' },
-        { title: 'Сканирование тела', duration: '15 мин', url: '#', thumb: '🧠' },
-        { title: 'Медитация благодарности', duration: '10 мин', url: '#', thumb: '💖' }
+        { title: 'Осознанное дыхание', duration: '5 мин', videoId: 'aakb1q0A8dk', thumb: 'https://img.youtube.com/vi/aakb1q0A8dk/hqdefault.jpg' },
+        { title: 'Сканирование тела', duration: '15 мин', videoId: 'sG4NFqU7I7s', thumb: 'https://img.youtube.com/vi/sG4NFqU7I7s/hqdefault.jpg' },
+        { title: 'Медитация благодарности', duration: '10 мин', videoId: '7tF-4Tg4XgU', thumb: 'https://img.youtube.com/vi/7tF-4Tg4XgU/hqdefault.jpg' }
     ];
+
     const wTab = document.getElementById('workouts-tab');
     const mTab = document.getElementById('meditations-tab');
+
     if (wTab) {
         wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
             <div class="video-card">
-                <div class="video-thumbnail">${v.thumb}</div>
+                <div class="video-thumbnail" style="border-radius: 8px; overflow: hidden;">
+                    <img src="${v.thumb}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 <div class="video-info">
                     <div class="video-title">${v.title}</div>
                     <div class="video-duration">${v.duration}</div>
-                    <a href="${v.url}" target="_blank" class="video-link">Смотреть</a>
+                    <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">Смотреть</button>
                 </div>
             </div>`).join('')}</div>`;
+
+        wTab.querySelectorAll('.video-link').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const videoId = btn.dataset.videoId;
+                const title = btn.dataset.title;
+                openVideoModal(title, videoId);
+            });
+        });
     }
+
     if (mTab) {
         mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
             <div class="video-card">
-                <div class="video-thumbnail">${v.thumb}</div>
+                <div class="video-thumbnail" style="border-radius: 8px; overflow: hidden;">
+                    <img src="${v.thumb}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 <div class="video-info">
                     <div class="video-title">${v.title}</div>
                     <div class="video-duration">${v.duration}</div>
-                    <a href="${v.url}" target="_blank" class="video-link">Смотреть</a>
+                    <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">Смотреть</button>
                 </div>
             </div>`).join('')}</div>`;
+
+        mTab.querySelectorAll('.video-link').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const videoId = btn.dataset.videoId;
+                const title = btn.dataset.title;
+                openVideoModal(title, videoId);
+            });
+        });
     }
 }
 
+// ==================== ВИДЕО ПЛЕЕР ====================
+function openVideoModal(title, videoId) {
+    if (!elements.videoModal || !elements.videoPlayer) return;
+    elements.videoModalTitle.textContent = title;
+    // Формируем embed URL с параметрами автоплей, полноэкранный режим
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1`;
+    elements.videoPlayer.src = embedUrl;
+    // Сохраняем URL для кнопки "Смотреть на YouTube"
+    elements.watchOnYoutubeBtn.dataset.url = `https://youtu.be/${videoId}`;
+    showModal('video-modal');
+}
+
+// ==================== АККАУНТ ====================
 function renderAccountStats() {
     if (elements.accountStatStreak) elements.accountStatStreak.textContent = state.streak;
     if (elements.accountStatHabits) elements.accountStatHabits.textContent = state.habits.length;
     if (elements.accountStatNotes) elements.accountStatNotes.textContent = state.notes.length;
 }
 
+// ==================== МОДАЛЬНЫЕ ОКНА ====================
 function showModal(modalId) {
     document.getElementById(modalId)?.classList.add('active');
 }
 function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
+    // Останавливаем видео при закрытии
+    if (modalId === 'video-modal' && elements.videoPlayer) {
+        elements.videoPlayer.src = '';
+    }
 }
 
+// ==================== TOAST ====================
 function showToast(message) {
     const toast = document.createElement('div');
     toast.textContent = message;
@@ -706,6 +819,7 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2000);
 }
 
+// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ====================
 function saveData() {
     const data = {
         habits: state.habits,
@@ -744,5 +858,6 @@ function loadData() {
     }
 }
 
+// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
