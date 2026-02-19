@@ -299,7 +299,7 @@ function setMood(mood) {
     state.currentMood = mood;
     saveData();
 
-    const moodNames = ['', 'Плохо', 'Не очень', 'Нормально', 'Хорошо', 'Отлично!'];
+    const moodNames = ['', 'Плохо', 'Не очень', 'Хорошо', 'Отлично!'];
     showToast(moodNames[mood]); // всегда используем автоматический тост
 }
 
@@ -539,10 +539,10 @@ function renderNotes() {
 
     const moodEmojis = [
         '', 
-        '<img src="images/mood1.png" class="note-mood-img" alt="Плохо">',
-        '<img src="images/mood2.png" class="note-mood-img" alt="Не очень">',
-        '<img src="images/mood4.png" class="note-mood-img" alt="Нормально">',
-        '<img src="images/mood5.png" class="note-mood-img" alt="Хорошо!">'
+        '<img src="images/badly.png" class="note-mood-img" alt="Плохо">',
+        '<img src="images/not_good.png" class="note-mood-img" alt="Не очень">',
+        '<img src="images/good.png" class="note-mood-img" alt="Хорошо">',
+        '<img src="images/great.png" class="note-mood-img" alt="Отлично!">'
     ];
 
     elements.notesList.innerHTML = filtered.map(note => {
@@ -787,4 +787,5 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
 
