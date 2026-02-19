@@ -423,7 +423,7 @@ function renderHabits() {
         return `
             <div class="habit-item">
                 <div class="habit-info">
-                    <div class="habit-icon">${completed ? '✅' : '📌'}</div>
+                    <div class="habit-icon">${completed ? '✅' : '📎'}</div>
                     <div class="habit-text">
                         <h4>${habit.title}</h4>
                         ${habit.description ? `<div class="habit-description">${habit.description}</div>` : ''}
@@ -787,5 +787,6 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
 
 
