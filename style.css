@@ -201,14 +201,13 @@ body {
     color: var(--accent);
 }
 
-/* ===== НАСТРОЕНИЕ (ИСПРАВЛЕНО) ===== */
+/* ===== НАСТРОЕНИЕ ===== */
 .mood-grid {
     display: grid;
-    /* Раньше было repeat(5, 1fr) — теперь ровно 4 колонки */
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px; /* немного увеличил отступ для лучшего вида */
+    gap: 12px;
     justify-items: center;
-    justify-content: center; /* дополнительное центрирование */
+    justify-content: center;
     margin: 0 auto;
     max-width: 100%;
 }
@@ -238,7 +237,6 @@ body {
     transform: scale(1.4);
 }
 
-/* ===== МИНИ-СЕТКА ДЛЯ МОДАЛКИ ЗАМЕТКИ ===== */
 .mini-mood-grid {
     display: flex;
     gap: 8px;
@@ -334,6 +332,7 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
+    flex: 1;
 }
 
 .habit-icon {
@@ -346,6 +345,11 @@ body {
     justify-content: center;
     font-size: 20px;
     color: var(--accent);
+    flex-shrink: 0;
+}
+
+.habit-text {
+    flex: 1;
 }
 
 .habit-text h4 {
@@ -360,10 +364,19 @@ body {
     color: var(--text-tertiary);
 }
 
+/* Новый стиль для описания привычки */
+.habit-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
 .habit-actions {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .habit-check {
@@ -628,9 +641,10 @@ body {
     overflow: hidden;
 }
 
+/* Увеличенный размер эмодзи в заметках */
 .note-mood-img {
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
     vertical-align: middle;
 }
@@ -1074,7 +1088,7 @@ input:checked + .slider:before {
     border: none;
 }
 
-/* ===== УВЕДОМЛЕНИЯ ===== */
+/* ===== УВЕДОМЛЕНИЯ (TOAST) ===== */
 @keyframes fadeInOut {
     0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
     10% { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -1121,6 +1135,12 @@ input:checked + .slider:before {
     .account-header {
         flex-direction: column;
         text-align: center;
+    }
+
+    /* Уменьшаем эмодзи в заметках на маленьких экранах */
+    .note-mood-img {
+        width: 32px;
+        height: 32px;
     }
 }
 
