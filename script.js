@@ -1,7 +1,7 @@
 // =====================================================
 // MoodCraft — Telegram Mini App
 // Основной файл с логикой приложения
-// =============================================
+// =====================================================
 
 // ==================== РАБОТА С TELEGRAM ====================
 const tg = window.Telegram?.WebApp;
@@ -74,7 +74,7 @@ const elements = {
     noteMoodOptions: document.querySelectorAll('.mood-option'),
     noteDeleteBtn: document.getElementById('note-delete-btn'),
 
-    // Новые элементы для видео
+    // Элементы для видео
     videoModal: document.getElementById('video-modal'),
     videoPlayer: document.getElementById('video-player'),
     videoModalTitle: document.getElementById('video-modal-title'),
@@ -121,7 +121,6 @@ function handleStartParam() {
         case 'note':
             switchPage('diary');
             state.selectedDate = new Date();
-            // Проверяем, есть ли заметка на сегодня
             const todayNote = state.notes.find(n => isSameDay(new Date(n.date), new Date()));
             if (todayNote) {
                 state.editingNoteId = todayNote.id;
@@ -146,7 +145,6 @@ function setupGreeting() {
 }
 
 function setupEventListeners() {
-    // Переключение страниц через нижнее меню
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -156,7 +154,6 @@ function setupEventListeners() {
         });
     });
 
-    // Выбор настроения на главной
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -166,7 +163,6 @@ function setupEventListeners() {
         });
     });
 
-    // Кнопка добавления привычки
     if (elements.addHabitBtn) {
         elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
@@ -174,7 +170,6 @@ function setupEventListeners() {
         });
     }
 
-    // Переключение недели в календаре
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -186,16 +181,10 @@ function setupEventListeners() {
         });
     }
 
-    // Поиск по заметкам
     elements.searchNotes?.addEventListener('input', renderNotes);
-
-    // Управление модальными окнами
     setupModalControls();
-
-    // Вкладки в разделе практик
     setupPracticeTabs();
 
-    // Переключение тёмной темы
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -204,7 +193,6 @@ function setupEventListeners() {
         });
     }
 
-    // Скрытие клавиатуры при клике вне поля поиска
     document.addEventListener('click', function(e) {
         const searchInput = elements.searchNotes;
         if (searchInput && !searchInput.contains(e.target)) {
@@ -214,7 +202,6 @@ function setupEventListeners() {
 }
 
 function setupModalControls() {
-    // Закрытие модалки привычки
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
@@ -222,14 +209,11 @@ function setupModalControls() {
             if (elements.habitDesc) elements.habitDesc.value = '';
         });
     });
-    // Сохранение привычки
     document.getElementById('save-btn')?.addEventListener('click', saveHabit);
-    // Сохранение по Enter
     elements.habitInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') saveHabit();
     });
 
-    // Закрытие модалки заметки
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -238,20 +222,16 @@ function setupModalControls() {
         });
     });
 
-    // Сохранение заметки
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
 
-    // Удаление заметки
     if (elements.noteDeleteBtn) {
         elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     }
 
-    // Счётчик символов в заметке
     elements.noteInput?.addEventListener('input', (e) => {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
-    // Выбор настроения внутри модалки заметки
     elements.noteMoodOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
@@ -259,7 +239,6 @@ function setupModalControls() {
         });
     });
 
-    // Закрытие модалки при клике на фон
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
@@ -426,7 +405,6 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
-// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
 function render() {
     renderHabits();
     updateStats();
@@ -482,7 +460,6 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
-// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -494,9 +471,8 @@ function renderCalendar() {
         elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     }
 
-    // Находим понедельник этой недели
     const monday = new Date(currentDate);
-    const day = monday.getDay(); // 0 = воскресенье, 1 = понедельник, ...
+    const day = monday.getDay();
     const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
     monday.setDate(diff);
 
@@ -513,22 +489,15 @@ function renderCalendar() {
             <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
         `;
 
-        // Отмечаем сегодняшний день
         if (isSameDay(date, today)) btn.classList.add('today');
-
-        // Отмечаем выбранный день
         if (state.selectedDate && isSameDay(date, state.selectedDate)) btn.classList.add('selected');
 
-        // Отмечаем дни с заметками
         const hasNote = state.notes.some(note => {
             try { return isSameDay(new Date(note.date), date); } catch { return false; }
         });
         if (hasNote) btn.classList.add('has-note');
 
-        // Дни из другого месяца
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
-
-        // Выделяем выходные
         if (i === 5 || i === 6) btn.classList.add('weekend-number');
 
         const dateCopy = new Date(date);
@@ -538,7 +507,6 @@ function renderCalendar() {
                 showToast('Заметки заранее недоступны');
                 return;
             }
-            // Ищем существующую заметку для этой даты
             const existingNote = state.notes.find(n => isSameDay(new Date(n.date), dateCopy));
             if (existingNote) {
                 state.editingNoteId = existingNote.id;
@@ -560,7 +528,6 @@ function isSameDay(date1, date2) {
            date1.getFullYear() === date2.getFullYear();
 }
 
-// ==================== ЗАМЕТКИ ====================
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
@@ -598,7 +565,6 @@ function renderNotes() {
                 </div>`;
     }).join('');
 
-    // Клик по карточке заметки открывает её для редактирования
     document.querySelectorAll('.note-card').forEach(card => {
         card.addEventListener('click', function () {
             const id = parseInt(this.dataset.id);
@@ -613,7 +579,6 @@ function renderNotes() {
 }
 
 function openNoteModal(note = null) {
-    // Проверка на будущую дату (только для новых заметок)
     if (!note && state.selectedDate > new Date()) {
         showToast('Заметки заранее недоступны');
         return;
@@ -698,7 +663,6 @@ function deleteCurrentNote() {
     }
 }
 
-// ==================== ПРАКТИКИ ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -713,10 +677,7 @@ function setupPracticeTabs() {
 }
 
 function renderPracticeContent() {
-    // Примеры видео с реальными ID (можно заменить на свои)
     const workouts = [
-        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут', duration: '40 мин', videoId: 'ujkE3ZOcTrQ', thumb: 'https://img.youtube.com/vi/ujkE3ZOcTrQ/hqdefault.jpg' },
-        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'E16zGKdeMz4', thumb: 'https://img.youtube.com/vi/E16zGKdeMz4/hqdefault.jpg' },
         { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'E16zGKdeMz4', thumb: 'https://img.youtube.com/vi/E16zGKdeMz4/hqdefault.jpg' },
         { title: 'ШАГИ ДЛЯ ПОХУДЕНИЯ под Русскоязычные Хиты 2000-х! | Пройди 5000 ШАГОВ ДОМА', duration: '? мин', videoId: '32xCCheCMtQ', thumb: 'https://img.youtube.com/vi/32xCCheCMtQ/hqdefault.jpg' },
         { title: 'Танцевальная Зарядка за 10 минут под Хиты 2000-х!', duration: '10 мин', videoId: 'jzuULVNrWhE', thumb: 'https://img.youtube.com/vi/jzuULVNrWhE/hqdefault.jpg' },
@@ -739,8 +700,8 @@ function renderPracticeContent() {
     if (wTab) {
         wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
             <div class="video-card">
-                <div class="video-thumbnail" style="border-radius: 8px; overflow: hidden;">
-                    <img src="${v.thumb}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="video-thumbnail">
+                    <img src="${v.thumb}" alt="${v.title}" loading="lazy">
                 </div>
                 <div class="video-info">
                     <div class="video-title">${v.title}</div>
@@ -761,8 +722,8 @@ function renderPracticeContent() {
     if (mTab) {
         mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
             <div class="video-card">
-                <div class="video-thumbnail" style="border-radius: 8px; overflow: hidden;">
-                    <img src="${v.thumb}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="video-thumbnail">
+                    <img src="${v.thumb}" alt="${v.title}" loading="lazy">
                 </div>
                 <div class="video-info">
                     <div class="video-title">${v.title}</div>
@@ -784,12 +745,14 @@ function renderPracticeContent() {
 // ==================== ВИДЕО ПЛЕЕР ====================
 function openVideoModal(title, videoId) {
     if (!elements.videoModal || !elements.videoPlayer) return;
+    
     elements.videoModalTitle.textContent = title;
-    // Формируем embed URL с параметрами автоплей, полноэкранный режим
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1`;
+    
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&rel=0&modestbranding=1`;
     elements.videoPlayer.src = embedUrl;
-    // Сохраняем URL для кнопки "Смотреть на YouTube"
+    
     elements.watchOnYoutubeBtn.dataset.url = `https://youtu.be/${videoId}`;
+    
     showModal('video-modal');
 }
 
@@ -806,7 +769,6 @@ function showModal(modalId) {
 }
 function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
-    // Останавливаем видео при закрытии
     if (modalId === 'video-modal' && elements.videoPlayer) {
         elements.videoPlayer.src = '';
     }
@@ -869,4 +831,3 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
-
