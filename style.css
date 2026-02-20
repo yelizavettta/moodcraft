@@ -822,15 +822,29 @@ body {
     font-size: 16px;
 }
 
-/* ===== МОДАЛЬНОЕ ОКНО ВИДЕО (СТИЛЬНЫЙ ПЛЕЕР) ===== */
+/* ===== МОДАЛЬНОЕ ОКНО ВИДЕО ===== */
+/* ===== МОДАЛЬНОЕ ОКНО ВИДЕО (УЛУЧШЕННАЯ ВЕРСИЯ) ===== */
 #video-modal .modal-content {
-    max-width: 560px;
-    width: 90%;
+    max-width: 720px;        /* Ещё больше на широких экранах */
+    width: 95%;              /* Почти на всю ширину */
     background: var(--bg-card);
     border-radius: 28px;
     overflow: hidden;
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Более глубокая тень */
+    animation: modalZoom 0.3s ease-out;
+}
+
+/* Анимация появления */
+@keyframes modalZoom {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 #video-modal .modal-header {
@@ -839,31 +853,41 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: var(--bg-card);
 }
 
 #video-modal .modal-header h3 {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 70%;
+    max-width: 80%;
+    margin: 0;
 }
 
 #video-modal .close-btn {
-    background: none;
+    background: var(--bg-secondary);
     border: none;
-    font-size: 26px;
+    font-size: 24px;
     color: var(--text-tertiary);
     cursor: pointer;
-    padding: 0 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
     line-height: 1;
-    transition: color 0.2s;
+    padding: 0;
 }
 
 #video-modal .close-btn:hover {
+    background: var(--accent-soft);
     color: var(--accent);
+    transform: rotate(90deg);
 }
 
 #video-modal .modal-body {
@@ -883,38 +907,80 @@ body {
 #video-modal .modal-actions {
     display: flex;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 20px;
     background: var(--bg-card);
     border-top: 1px solid var(--border-light);
+    justify-content: flex-end; /* Кнопки справа */
 }
 
 #video-modal .btn {
-    flex: 1;
-    padding: 12px;
+    padding: 12px 24px;
     border-radius: 40px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.2s, background 0.2s;
+    transition: all 0.2s;
     border: none;
     text-align: center;
+    min-width: 140px;
 }
 
 #video-modal .btn.secondary {
-    background: var(--bg-primary);
+    background: transparent;
     color: var(--text-secondary);
     border: 1px solid var(--border);
+}
+
+#video-modal .btn.secondary:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-light);
 }
 
 #video-modal .btn.primary {
     background: var(--accent);
     color: white;
-    box-shadow: 0 4px 12px rgba(204, 139, 122, 0.3);
+    box-shadow: 0 8px 16px rgba(204, 139, 122, 0.25);
+}
+
+#video-modal .btn.primary:hover {
+    background: color-mix(in srgb, var(--accent) 90%, black);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(204, 139, 122, 0.35);
 }
 
 #video-modal .btn:active {
-    opacity: 0.8;
-    transform: scale(0.97);
+    transform: translateY(0);
+    opacity: 0.9;
+}
+
+/* Адаптация для маленьких экранов */
+@media (max-width: 480px) {
+    #video-modal .modal-content {
+        width: 100%;
+        border-radius: 20px;
+    }
+    #video-modal .modal-header {
+        padding: 12px 16px;
+    }
+    #video-modal .modal-header h3 {
+        font-size: 16px;
+    }
+    #video-modal .close-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+    #video-modal .modal-actions {
+        padding: 16px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    #video-modal .btn {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
 }
 
 /* ===== АККАУНТ ===== */
@@ -1322,3 +1388,4 @@ input:checked + .slider:before {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
+
