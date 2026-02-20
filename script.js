@@ -1,7 +1,7 @@
 // =====================================================
 // MoodCraft — Telegram Mini App
 // Основной файл с логикой приложения
-// =====================================================
+// =============================================
 
 // ==================== РАБОТА С TELEGRAM ====================
 const tg = window.Telegram?.WebApp;
@@ -74,7 +74,7 @@ const elements = {
     noteMoodOptions: document.querySelectorAll('.mood-option'),
     noteDeleteBtn: document.getElementById('note-delete-btn'),
 
-    // Элементы для видео
+    // Видео
     videoModal: document.getElementById('video-modal'),
     videoPlayer: document.getElementById('video-player'),
     videoModalTitle: document.getElementById('video-modal-title'),
@@ -145,6 +145,7 @@ function setupGreeting() {
 }
 
 function setupEventListeners() {
+    // Переключение страниц
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -154,6 +155,7 @@ function setupEventListeners() {
         });
     });
 
+    // Настроение
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -163,6 +165,7 @@ function setupEventListeners() {
         });
     });
 
+    // Добавление привычки
     if (elements.addHabitBtn) {
         elements.addHabitBtn.addEventListener('click', () => {
             showModal('habit-modal');
@@ -170,6 +173,7 @@ function setupEventListeners() {
         });
     }
 
+    // Календарь
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
         elements.prevWeekBtn.addEventListener('click', () => {
             state.currentWeek--;
@@ -181,10 +185,16 @@ function setupEventListeners() {
         });
     }
 
+    // Поиск заметок
     elements.searchNotes?.addEventListener('input', renderNotes);
+
+    // Модалки
     setupModalControls();
+
+    // Вкладки практик
     setupPracticeTabs();
 
+    // Тема
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('change', (e) => {
             state.darkTheme = e.target.checked;
@@ -193,6 +203,7 @@ function setupEventListeners() {
         });
     }
 
+    // Скрытие клавиатуры
     document.addEventListener('click', function(e) {
         const searchInput = elements.searchNotes;
         if (searchInput && !searchInput.contains(e.target)) {
@@ -202,6 +213,7 @@ function setupEventListeners() {
 }
 
 function setupModalControls() {
+    // Закрытие модалки привычки
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('habit-modal');
@@ -214,6 +226,7 @@ function setupModalControls() {
         if (e.key === 'Enter') saveHabit();
     });
 
+    // Закрытие модалки заметки
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             hideModal('note-modal');
@@ -221,17 +234,15 @@ function setupModalControls() {
             state.editingNoteId = null;
         });
     });
-
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
-
     if (elements.noteDeleteBtn) {
         elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     }
-
     elements.noteInput?.addEventListener('input', (e) => {
         if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
     });
 
+    // Выбор настроения в заметке
     elements.noteMoodOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
@@ -239,6 +250,7 @@ function setupModalControls() {
         });
     });
 
+    // Закрытие модалок по клику на фон
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) hideModal(modal.id);
@@ -405,6 +417,7 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
+// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
 function render() {
     renderHabits();
     updateStats();
@@ -460,6 +473,7 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
+// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
@@ -471,8 +485,9 @@ function renderCalendar() {
         elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     }
 
+    // Находим понедельник этой недели
     const monday = new Date(currentDate);
-    const day = monday.getDay();
+    const day = monday.getDay(); // 0 = воскресенье, 1 = понедельник, ...
     const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
     monday.setDate(diff);
 
@@ -489,15 +504,22 @@ function renderCalendar() {
             <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
         `;
 
+        // Отмечаем сегодняшний день
         if (isSameDay(date, today)) btn.classList.add('today');
+
+        // Отмечаем выбранный день
         if (state.selectedDate && isSameDay(date, state.selectedDate)) btn.classList.add('selected');
 
+        // Отмечаем дни с заметками
         const hasNote = state.notes.some(note => {
             try { return isSameDay(new Date(note.date), date); } catch { return false; }
         });
         if (hasNote) btn.classList.add('has-note');
 
+        // Дни из другого месяца
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
+
+        // Выделяем выходные
         if (i === 5 || i === 6) btn.classList.add('weekend-number');
 
         const dateCopy = new Date(date);
@@ -528,6 +550,7 @@ function isSameDay(date1, date2) {
            date1.getFullYear() === date2.getFullYear();
 }
 
+// ==================== ЗАМЕТКИ ====================
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
@@ -663,6 +686,7 @@ function deleteCurrentNote() {
     }
 }
 
+// ==================== ПРАКТИКИ (ОБНОВЛЕНО) ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -677,21 +701,25 @@ function setupPracticeTabs() {
 }
 
 function renderPracticeContent() {
+    // Примеры видео с реальными ID (можно заменить на свои)
     const workouts = [
-        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'E16zGKdeMz4', thumb: 'https://img.youtube.com/vi/E16zGKdeMz4/hqdefault.jpg' },
-        { title: 'ШАГИ ДЛЯ ПОХУДЕНИЯ под Русскоязычные Хиты 2000-х! | Пройди 5000 ШАГОВ ДОМА', duration: '? мин', videoId: '32xCCheCMtQ', thumb: 'https://img.youtube.com/vi/32xCCheCMtQ/hqdefault.jpg' },
-        { title: 'Танцевальная Зарядка за 10 минут под Хиты 2000-х!', duration: '10 мин', videoId: 'jzuULVNrWhE', thumb: 'https://img.youtube.com/vi/jzuULVNrWhE/hqdefault.jpg' },
-        { title: 'КРУГОВАЯ Тренировка на Все Тело с ГАНТЕЛЯМИ за 45 Минут | Жиросжигатель', duration: '45 мин', videoId: 'F3a9Lxay_sc', thumb: 'https://img.youtube.com/vi/F3a9Lxay_sc/hqdefault.jpg' },
-        { title: 'Шаговая Тренировка за 15 минут под Рок Хиты! | ШАГАЙ ДОМА и ХУДЕЙ', duration: '15 мин', videoId: 'v4JvhFGh5Kw', thumb: 'https://img.youtube.com/vi/v4JvhFGh5Kw/hqdefault.jpg' },
-        { title: 'Тренировка на Всё Тело БЕЗ ПОВТОРОВ с Гантелями за 15 минут Дома', duration: '15 мин', videoId: 'h1WpYiXVS6s', thumb: 'https://img.youtube.com/vi/h1WpYiXVS6s/hqdefault.jpg' },
-        { title: 'Утренняя Зарядка СТОЯ за 5 минут | Суставная Разминка на Всё Тело', duration: '5 мин', videoId: 'zFOG16nn-iY', thumb: 'https://img.youtube.com/vi/zFOG16nn-iY/hqdefault.jpg' },
-        { title: 'Пилатес для Плоского Живота за 10 минут | Спокойная Тренировка на ПРЕСС', duration: '10 мин', videoId: 'aOzIPZ1aPRo', thumb: 'https://img.youtube.com/vi/aOzIPZ1aPRo/hqdefault.jpg' },
-        { title: 'Название видео с канала', duration: '?? мин', videoId: 'u0drnTv2v6c', thumb: 'https://img.youtube.com/vi/u0drnTv2v6c/hqdefault.jpg' }
+        { title: 'Утренняя зарядка', duration: '10 мин', videoId: 'dQw4w9WgXcQ', channel: 'Фитнес дома', views: '123 тыс.' },
+        { title: 'Йога для начинающих', duration: '20 мин', videoId: 'p3S--c29D-8', channel: 'Йога с Таней', views: '89 тыс.' },
+        { title: 'Кардио дома', duration: '15 мин', videoId: 'ml6cT4AZdqI', channel: 'Фитнес дома', views: '234 тыс.' },
+        { title: 'Тренировка с гантелями', duration: '40 мин', videoId: 'ujkE3ZOcTrQ', channel: 'Татьяна Метельская', views: '456 тыс.' },
+        { title: 'Шаги для похудения', duration: '30 мин', videoId: '32xCCheCMtQ', channel: 'Татьяна Метельская', views: '78 тыс.' },
+        { title: 'Танцевальная зарядка', duration: '10 мин', videoId: 'jzuULVNrWhE', channel: 'Татьяна Метельская', views: '150 тыс.' },
+        { title: 'Круговая тренировка', duration: '45 мин', videoId: 'F3a9Lxay_sc', channel: 'Татьяна Метельская', views: '92 тыс.' },
+        { title: 'Шаговая под рок', duration: '15 мин', videoId: 'v4JvhFGh5Kw', channel: 'Татьяна Метельская', views: '110 тыс.' },
+        { title: 'Тренировка 15 мин', duration: '15 мин', videoId: 'h1WpYiXVS6s', channel: 'Татьяна Метельская', views: '67 тыс.' },
+        { title: 'Утренняя зарядка стоя', duration: '5 мин', videoId: 'zFOG16nn-iY', channel: 'Татьяна Метельская', views: '312 тыс.' },
+        { title: 'Пилатес для живота', duration: '10 мин', videoId: 'aOzIPZ1aPRo', channel: 'Татьяна Метельская', views: '88 тыс.' },
+        { title: 'Растяжка', duration: '10 мин', videoId: 'u0drnTv2v6c', channel: 'Татьяна Метельская', views: '45 тыс.' }
     ];
     const meditations = [
-        { title: 'Осознанное дыхание', duration: '5 мин', videoId: 'aakb1q0A8dk', thumb: 'https://img.youtube.com/vi/aakb1q0A8dk/hqdefault.jpg' },
-        { title: 'Сканирование тела', duration: '15 мин', videoId: 'sG4NFqU7I7s', thumb: 'https://img.youtube.com/vi/sG4NFqU7I7s/hqdefault.jpg' },
-        { title: 'Медитация благодарности', duration: '10 мин', videoId: '7tF-4Tg4XgU', thumb: 'https://img.youtube.com/vi/7tF-4Tg4XgU/hqdefault.jpg' }
+        { title: 'Осознанное дыхание', duration: '5 мин', videoId: 'aakb1q0A8dk', channel: 'Медитации', views: '34 тыс.' },
+        { title: 'Сканирование тела', duration: '15 мин', videoId: 'sG4NFqU7I7s', channel: 'Медитации', views: '22 тыс.' },
+        { title: 'Медитация благодарности', duration: '10 мин', videoId: '7tF-4Tg4XgU', channel: 'Медитации', views: '18 тыс.' }
     ];
 
     const wTab = document.getElementById('workouts-tab');
@@ -701,17 +729,29 @@ function renderPracticeContent() {
         wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
             <div class="video-card">
                 <div class="video-thumbnail">
-                    <img src="${v.thumb}" alt="${v.title}" loading="lazy">
+                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+                    <span class="video-duration-badge">${v.duration}</span>
                 </div>
                 <div class="video-info">
-                    <div class="video-title">${v.title}</div>
-                    <div class="video-duration">${v.duration}</div>
-                    <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">Смотреть</button>
+                    <h4 class="video-title">${v.title}</h4>
+                    <div class="video-meta">
+                        <span class="video-channel">
+                            <span class="channel-avatar">🏋️</span>
+                            ${v.channel}
+                        </span>
+                        <span class="video-views">👁️ ${v.views}</span>
+                    </div>
+                    <div class="video-actions">
+                        <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">
+                            <i class="fas fa-play"></i> Смотреть
+                        </button>
+                    </div>
                 </div>
             </div>`).join('')}</div>`;
 
         wTab.querySelectorAll('.video-link').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const videoId = btn.dataset.videoId;
                 const title = btn.dataset.title;
                 openVideoModal(title, videoId);
@@ -723,17 +763,29 @@ function renderPracticeContent() {
         mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
             <div class="video-card">
                 <div class="video-thumbnail">
-                    <img src="${v.thumb}" alt="${v.title}" loading="lazy">
+                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+                    <span class="video-duration-badge">${v.duration}</span>
                 </div>
                 <div class="video-info">
-                    <div class="video-title">${v.title}</div>
-                    <div class="video-duration">${v.duration}</div>
-                    <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">Смотреть</button>
+                    <h4 class="video-title">${v.title}</h4>
+                    <div class="video-meta">
+                        <span class="video-channel">
+                            <span class="channel-avatar">🧘</span>
+                            ${v.channel}
+                        </span>
+                        <span class="video-views">👁️ ${v.views}</span>
+                    </div>
+                    <div class="video-actions">
+                        <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">
+                            <i class="fas fa-play"></i> Смотреть
+                        </button>
+                    </div>
                 </div>
             </div>`).join('')}</div>`;
 
         mTab.querySelectorAll('.video-link').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const videoId = btn.dataset.videoId;
                 const title = btn.dataset.title;
                 openVideoModal(title, videoId);
@@ -748,9 +800,11 @@ function openVideoModal(title, videoId) {
     
     elements.videoModalTitle.textContent = title;
     
+    // Формируем embed URL с параметрами для нормальной работы без авторизации
     const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&rel=0&modestbranding=1`;
     elements.videoPlayer.src = embedUrl;
     
+    // Сохраняем URL для кнопки "Смотреть на YouTube"
     elements.watchOnYoutubeBtn.dataset.url = `https://youtu.be/${videoId}`;
     
     showModal('video-modal');
@@ -769,6 +823,7 @@ function showModal(modalId) {
 }
 function hideModal(modalId) {
     document.getElementById(modalId)?.classList.remove('active');
+    // Останавливаем видео при закрытии
     if (modalId === 'video-modal' && elements.videoPlayer) {
         elements.videoPlayer.src = '';
     }
