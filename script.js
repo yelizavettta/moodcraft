@@ -715,9 +715,17 @@ function setupPracticeTabs() {
 function renderPracticeContent() {
     // Примеры видео с реальными ID (можно заменить на свои)
     const workouts = [
-        { title: 'Утренняя зарядка', duration: '10 мин', videoId: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
-        { title: 'Йога для начинающих', duration: '20 мин', videoId: 'p3S--c29D-8', thumb: 'https://img.youtube.com/vi/p3S--c29D-8/hqdefault.jpg' },
-        { title: 'Кардио дома', duration: '15 мин', videoId: 'ml6cT4AZdqI', thumb: 'https://img.youtube.com/vi/ml6cT4AZdqI/hqdefault.jpg' }
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут', duration: '40 мин', videoId: 'ujkE3ZOcTrQ', thumb: 'https://img.youtube.com/vi/ujkE3ZOcTrQ/hqdefault.jpg' },
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'E16zGKdeMz4', thumb: 'https://img.youtube.com/vi/E16zGKdeMz4/hqdefault.jpg' },
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'E16zGKdeMz4', thumb: 'https://img.youtube.com/vi/E16zGKdeMz4/hqdefault.jpg' },
+        { title: 'ШАГИ ДЛЯ ПОХУДЕНИЯ под Русскоязычные Хиты 2000-х! | Пройди 5000 ШАГОВ ДОМА', duration: '? мин', videoId: '32xCCheCMtQ', thumb: 'https://img.youtube.com/vi/32xCCheCMtQ/hqdefault.jpg' },
+        { title: 'Танцевальная Зарядка за 10 минут под Хиты 2000-х!', duration: '10 мин', videoId: 'jzuULVNrWhE', thumb: 'https://img.youtube.com/vi/jzuULVNrWhE/hqdefault.jpg' },
+        { title: 'КРУГОВАЯ Тренировка на Все Тело с ГАНТЕЛЯМИ за 45 Минут | Жиросжигатель', duration: '45 мин', videoId: 'F3a9Lxay_sc', thumb: 'https://img.youtube.com/vi/F3a9Lxay_sc/hqdefault.jpg' },
+        { title: 'Шаговая Тренировка за 15 минут под Рок Хиты! | ШАГАЙ ДОМА и ХУДЕЙ', duration: '15 мин', videoId: 'v4JvhFGh5Kw', thumb: 'https://img.youtube.com/vi/v4JvhFGh5Kw/hqdefault.jpg' },
+        { title: 'Тренировка на Всё Тело БЕЗ ПОВТОРОВ с Гантелями за 15 минут Дома', duration: '15 мин', videoId: 'h1WpYiXVS6s', thumb: 'https://img.youtube.com/vi/h1WpYiXVS6s/hqdefault.jpg' },
+        { title: 'Утренняя Зарядка СТОЯ за 5 минут | Суставная Разминка на Всё Тело', duration: '5 мин', videoId: 'zFOG16nn-iY', thumb: 'https://img.youtube.com/vi/zFOG16nn-iY/hqdefault.jpg' },
+        { title: 'Пилатес для Плоского Живота за 10 минут | Спокойная Тренировка на ПРЕСС', duration: '10 мин', videoId: 'aOzIPZ1aPRo', thumb: 'https://img.youtube.com/vi/aOzIPZ1aPRo/hqdefault.jpg' },
+        { title: 'Название видео с канала', duration: '?? мин', videoId: 'u0drnTv2v6c', thumb: 'https://img.youtube.com/vi/u0drnTv2v6c/hqdefault.jpg' }
     ];
     const meditations = [
         { title: 'Осознанное дыхание', duration: '5 мин', videoId: 'aakb1q0A8dk', thumb: 'https://img.youtube.com/vi/aakb1q0A8dk/hqdefault.jpg' },
@@ -861,3 +869,4 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
