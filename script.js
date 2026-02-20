@@ -701,20 +701,17 @@ function setupPracticeTabs() {
 }
 
 function renderPracticeContent() {
-    // Примеры видео с реальными ID (можно заменить на свои)
-    const workouts = [
-        { title: 'Утренняя зарядка', duration: '10 мин', videoId: 'dQw4w9WgXcQ', channel: 'Фитнес дома', views: '123 тыс.' },
-        { title: 'Йога для начинающих', duration: '20 мин', videoId: 'p3S--c29D-8', channel: 'Йога с Таней', views: '89 тыс.' },
-        { title: 'Кардио дома', duration: '15 мин', videoId: 'ml6cT4AZdqI', channel: 'Фитнес дома', views: '234 тыс.' },
-        { title: 'Тренировка с гантелями', duration: '40 мин', videoId: 'ujkE3ZOcTrQ', channel: 'Татьяна Метельская', views: '456 тыс.' },
-        { title: 'Шаги для похудения', duration: '30 мин', videoId: '32xCCheCMtQ', channel: 'Татьяна Метельская', views: '78 тыс.' },
-        { title: 'Танцевальная зарядка', duration: '10 мин', videoId: 'jzuULVNrWhE', channel: 'Татьяна Метельская', views: '150 тыс.' },
-        { title: 'Круговая тренировка', duration: '45 мин', videoId: 'F3a9Lxay_sc', channel: 'Татьяна Метельская', views: '92 тыс.' },
-        { title: 'Шаговая под рок', duration: '15 мин', videoId: 'v4JvhFGh5Kw', channel: 'Татьяна Метельская', views: '110 тыс.' },
-        { title: 'Тренировка 15 мин', duration: '15 мин', videoId: 'h1WpYiXVS6s', channel: 'Татьяна Метельская', views: '67 тыс.' },
-        { title: 'Утренняя зарядка стоя', duration: '5 мин', videoId: 'zFOG16nn-iY', channel: 'Татьяна Метельская', views: '312 тыс.' },
-        { title: 'Пилатес для живота', duration: '10 мин', videoId: 'aOzIPZ1aPRo', channel: 'Татьяна Метельская', views: '88 тыс.' },
-        { title: 'Растяжка', duration: '10 мин', videoId: 'u0drnTv2v6c', channel: 'Татьяна Метельская', views: '45 тыс.' }
+   const workouts = [
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'ujkE3ZOcTrQ', channel: 'Татьяна Метельская', views: '456 тыс.' },
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело (2)', duration: '40 мин', videoId: 'E16zGKdeMz4', channel: 'Татьяна Метельская', views: '389 тыс.' },
+        { title: 'ШАГИ ДЛЯ ПОХУДЕНИЯ под Русскоязычные Хиты 2000-х! | Пройди 5000 ШАГОВ ДОМА', duration: '30 мин', videoId: '32xCCheCMtQ', channel: 'Татьяна Метельская', views: '178 тыс.' },
+        { title: 'Танцевальная Зарядка за 10 минут под Хиты 2000-х!', duration: '10 мин', videoId: 'jzuULVNrWhE', channel: 'Татьяна Метельская', views: '250 тыс.' },
+        { title: 'КРУГОВАЯ Тренировка на Все Тело с ГАНТЕЛЯМИ за 45 Минут | Жиросжигатель', duration: '45 мин', videoId: 'F3a9Lxay_sc', channel: 'Татьяна Метельская', views: '192 тыс.' },
+        { title: 'Шаговая Тренировка за 15 минут под Рок Хиты! | ШАГАЙ ДОМА и ХУДЕЙ', duration: '15 мин', videoId: 'v4JvhFGh5Kw', channel: 'Татьяна Метельская', views: '310 тыс.' },
+        { title: 'Тренировка на Всё Тело БЕЗ ПОВТОРОВ с Гантелями за 15 минут Дома', duration: '15 мин', videoId: 'h1WpYiXVS6s', channel: 'Татьяна Метельская', views: '167 тыс.' },
+        { title: 'Утренняя Зарядка СТОЯ за 5 минут | Суставная Разминка на Всё Тело', duration: '5 мин', videoId: 'zFOG16nn-iY', channel: 'Татьяна Метельская', views: '412 тыс.' },
+        { title: 'Пилатес для Плоского Живота за 10 минут | Спокойная Тренировка на ПРЕСС', duration: '10 мин', videoId: 'aOzIPZ1aPRo', channel: 'Татьяна Метельская', views: '288 тыс.' },
+        { title: 'Жиросжигающая Тренировка ТАБАТА на ВСЁ ТЕЛО за 30 минут | Убери Живот Быстро!', duration: '30 мин', videoId: 'u0drnTv2v6c', channel: 'Татьяна Метельская', views: '345 тыс.' }
     ];
     const meditations = [
         { title: 'Осознанное дыхание', duration: '5 мин', videoId: 'aakb1q0A8dk', channel: 'Медитации', views: '34 тыс.' },
@@ -886,3 +883,4 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
