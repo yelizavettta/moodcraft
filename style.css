@@ -658,7 +658,7 @@ body {
     margin-bottom: 16px;
 }
 
-/* ===== ПРАКТИКИ (НОВЫЙ СОВРЕМЕННЫЙ ДИЗАЙН) ===== */
+/* ===== ПРАКТИКИ — НОВЫЙ ДИЗАЙН ===== */
 .practice-tabs {
     display: flex;
     gap: 10px;
@@ -699,17 +699,17 @@ body {
 .videos-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
 }
 
 .video-card {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
     border-radius: 18px;
-    padding: 14px;
+    padding: 12px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     transition: box-shadow 0.2s ease, transform 0.1s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
@@ -720,9 +720,9 @@ body {
 }
 
 .video-thumbnail {
-    width: 110px;
-    height: 75px;
-    border-radius: 14px;
+    width: 100px;
+    height: 68px;
+    border-radius: 12px;
     overflow: hidden;
     flex-shrink: 0;
     background: var(--accent-soft);
@@ -738,11 +738,11 @@ body {
 
 .video-info {
     flex: 1;
-    min-width: 0; /* чтобы текст мог ужиматься */
+    min-width: 0;
 }
 
 .video-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     line-height: 1.4;
     margin-bottom: 4px;
@@ -755,20 +755,20 @@ body {
 }
 
 .video-duration {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-tertiary);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .video-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 16px;
+    padding: 5px 14px;
     background: var(--accent);
     color: white;
     border-radius: 40px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -786,36 +786,99 @@ body {
     transform: scale(0.95);
 }
 
-/* Адаптация для очень маленьких экранов (до 380px) */
-@media (max-width: 380px) {
-    .practice-tabs {
-        padding: 4px;
-        gap: 6px;
-    }
-    .tab-btn {
-        padding: 10px 4px;
-        font-size: 13px;
-    }
-    .video-card {
-        padding: 12px;
-        gap: 12px;
-        border-radius: 16px;
-    }
-    .video-thumbnail {
-        width: 90px;
-        height: 62px;
-        border-radius: 12px;
-    }
-    .video-title {
-        font-size: 14px;
-    }
-    .video-duration {
-        font-size: 11px;
-    }
-    .video-link {
-        padding: 5px 14px;
-        font-size: 12px;
-    }
+/* ===== МОДАЛЬНОЕ ОКНО ВИДЕО (СТИЛЬНЫЙ ПЛЕЕР) ===== */
+#video-modal .modal-content {
+    max-width: 560px;
+    width: 90%;
+    background: var(--bg-card);
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+#video-modal .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#video-modal .modal-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+}
+
+#video-modal .close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+#video-modal .close-btn:hover {
+    color: var(--accent);
+}
+
+#video-modal .modal-body {
+    padding: 0;
+    background: #000;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+}
+
+#video-player {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+#video-modal .modal-actions {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-light);
+}
+
+#video-modal .btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, background 0.2s;
+    border: none;
+    text-align: center;
+}
+
+#video-modal .btn.secondary {
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+#video-modal .btn.primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(204, 139, 122, 0.3);
+}
+
+#video-modal .btn:active {
+    opacity: 0.8;
+    transform: scale(0.97);
 }
 
 /* ===== АККАУНТ ===== */
@@ -1156,6 +1219,30 @@ input:checked + .slider:before {
 }
 
 /* ===== АДАПТАЦИЯ ===== */
+@media (max-width: 480px) {
+    .video-thumbnail {
+        width: 90px;
+        height: 60px;
+    }
+    .video-title {
+        font-size: 13px;
+    }
+    .video-duration {
+        font-size: 10px;
+    }
+    .video-link {
+        padding: 4px 12px;
+        font-size: 11px;
+    }
+    #video-modal .modal-header h3 {
+        font-size: 16px;
+    }
+    #video-modal .btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
 @media (max-width: 380px) {
     .app-content {
         padding: 20px;
@@ -1177,16 +1264,6 @@ input:checked + .slider:before {
         height: 44px;
     }
 
-    .video-card {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .video-thumbnail {
-        width: 100px;
-        height: 75px;
-    }
-
     .account-header {
         flex-direction: column;
         text-align: center;
@@ -1203,4 +1280,3 @@ input:checked + .slider:before {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
-
