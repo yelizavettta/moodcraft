@@ -714,10 +714,57 @@ function renderPracticeContent() {
         { title: 'Жиросжигающая Тренировка ТАБАТА на ВСЁ ТЕЛО за 30 минут | Убери Живот Быстро!', duration: '30 мин', videoId: 'u0drnTv2v6c', channel: 'Татьяна Метельская', views: '345 тыс.' }
     ];
     const meditations = [
-        { title: 'Осознанное дыхание', duration: '5 мин', videoId: 'aakb1q0A8dk', channel: 'Медитации', views: '34 тыс.' },
-        { title: 'Сканирование тела', duration: '15 мин', videoId: 'sG4NFqU7I7s', channel: 'Медитации', views: '22 тыс.' },
-        { title: 'Медитация благодарности', duration: '10 мин', videoId: '7tF-4Tg4XgU', channel: 'Медитации', views: '18 тыс.' }
-    ];
+        { 
+            title: 'Средневековый костер у озера | Расслабляющая фэнтези музыка', 
+            duration: '60 мин', 
+            videoId: 'i-TOWDm0h2U', 
+            channel: 'Elder Melodies', 
+            views: '758 тыс.' 
+        },
+        { 
+            title: 'Долина тихого сердца | Фэнтези кельтская атмосфера', 
+            duration: '60 мин', 
+            videoId: 'aIMhtT52fi8', 
+            channel: 'Strings of Eternity', 
+            views: '687 тыс.' 
+        },
+        { 
+            title: 'Средневековая музыка для концентрации и спокойствия | Уютный зимний костер в Шире', 
+            duration: '60 мин', 
+            videoId: 'sDJO0EQP1Yo', 
+            channel: '舒适的港湾', 
+            views: '299 тыс.' 
+        },
+        { 
+            title: 'Средневековая и фэнтези музыка для глубокого расслабления', 
+            duration: '60 мин', 
+            videoId: '5QrlLqaLEs8', 
+            channel: 'Jai Melodies', 
+            views: '456 тыс.' 
+        },
+        { 
+            title: 'Фэнтези музыка для учебы и отдыха', 
+            duration: '60 мин', 
+            videoId: 'm2epskibmdA', 
+            channel: 'Fantasy Music', 
+            views: '892 тыс.' 
+        },
+        { 
+            title: 'Расслабляющая фэнтези музыка для глубокого сна', 
+            duration: '60 мин', 
+            videoId: '_QqabGYTSpQ', 
+            channel: 'Meditation Vibes', 
+            views: '523 тыс.' 
+        },
+        { 
+            title: 'Спокойная средневековая музыка для релаксации', 
+            duration: '60 мин', 
+            videoId: 'dztKn5ZZRN4', 
+            channel: 'Celtic Moods', 
+            views: '341 тыс.' 
+        }
+    ]; 
+    
 
     const wTab = document.getElementById('workouts-tab');
     const mTab = document.getElementById('meditations-tab');
@@ -883,4 +930,5 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
 
