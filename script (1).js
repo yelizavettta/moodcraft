@@ -1,7 +1,7 @@
 // =====================================================
 // MoodCraft — Telegram Mini App
-// Основной файл с логикой приложения
-// =============================================
+// Основной файл с логикой приложения (исправленная версия)
+// =====================================================
 
 // ==================== РАБОТА С TELEGRAM ====================
 const tg = window.Telegram?.WebApp;
@@ -84,7 +84,14 @@ const elements = {
 };
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        console.log('initApp started');
+        initApp();
+    } catch (error) {
+        console.error('Ошибка при инициализации:', error);
+    }
+});
 
 function initApp() {
     loadData();
@@ -96,6 +103,7 @@ function initApp() {
     renderPracticeContent();
     renderAccountStats();
     switchPage('home');
+    console.log('initApp finished');
 }
 
 // ==================== ОБРАБОТКА ПАРАМЕТРА ЗАПУСКА ====================
@@ -186,7 +194,9 @@ function setupEventListeners() {
     }
 
     // Поиск заметок
-    elements.searchNotes?.addEventListener('input', renderNotes);
+    if (elements.searchNotes) {
+        elements.searchNotes.addEventListener('input', renderNotes);
+    }
 
     // Модалки
     setupModalControls();
@@ -238,9 +248,11 @@ function setupModalControls() {
     if (elements.noteDeleteBtn) {
         elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     }
-    elements.noteInput?.addEventListener('input', (e) => {
-        if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
-    });
+    if (elements.noteInput) {
+        elements.noteInput.addEventListener('input', (e) => {
+            if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
+        });
+    }
 
     // Выбор настроения в заметке
     elements.noteMoodOptions.forEach(btn => {
@@ -273,6 +285,7 @@ function setupModalControls() {
 }
 
 function switchPage(page) {
+    console.log('switchPage', page);
     state.currentPage = page;
 
     const sections = [
@@ -284,21 +297,23 @@ function switchPage(page) {
         elements.practiceSection,
         elements.accountSection
     ];
-    sections.forEach(el => el?.classList.add('hidden'));
+    sections.forEach(el => {
+        if (el) el.classList.add('hidden');
+    });
 
     if (page === 'home') {
-        elements.welcomeCard?.classList.remove('hidden');
-        elements.moodSection?.classList.remove('hidden');
-        elements.habitsSection?.classList.remove('hidden');
-        elements.statsSection?.classList.remove('hidden');
+        if (elements.welcomeCard) elements.welcomeCard.classList.remove('hidden');
+        if (elements.moodSection) elements.moodSection.classList.remove('hidden');
+        if (elements.habitsSection) elements.habitsSection.classList.remove('hidden');
+        if (elements.statsSection) elements.statsSection.classList.remove('hidden');
     } else if (page === 'diary') {
-        elements.diarySection?.classList.remove('hidden');
+        if (elements.diarySection) elements.diarySection.classList.remove('hidden');
         renderCalendar();
         renderNotes();
     } else if (page === 'practice') {
-        elements.practiceSection?.classList.remove('hidden');
+        if (elements.practiceSection) elements.practiceSection.classList.remove('hidden');
     } else if (page === 'account') {
-        elements.accountSection?.classList.remove('hidden');
+        if (elements.accountSection) elements.accountSection.classList.remove('hidden');
         renderAccountStats();
     }
 }
@@ -329,11 +344,23 @@ function getTodayString() {
 }
 
 function migrateHabits(habits) {
-    return habits.map(habit => ({
-        ...habit,
-        completedDates: habit.completedDates || (habit.completed ? [getTodayString()] : []),
-        description: habit.description || ''
-    }));
+    return habits.map(habit => {
+        // Убедимся, что completedDates — массив
+        let completedDates = habit.completedDates;
+        if (!Array.isArray(completedDates)) {
+            // Если это старое поле completed, преобразуем
+            if (habit.completed) {
+                completedDates = [getTodayString()];
+            } else {
+                completedDates = [];
+            }
+        }
+        return {
+            ...habit,
+            completedDates,
+            description: habit.description || ''
+        };
+    });
 }
 
 function calculateOverallStreak() {
@@ -445,8 +472,8 @@ function renderHabits() {
                 <div class="habit-info">
                     <div class="habit-icon">${completed ? '✅' : '📎'}</div>
                     <div class="habit-text">
-                        <h4>${habit.title}</h4>
-                        ${habit.description ? `<div class="habit-description">${habit.description}</div>` : ''}
+                        <h4>${escapeHtml(habit.title)}</h4>
+                        ${habit.description ? `<div class="habit-description">${escapeHtml(habit.description)}</div>` : ''}
                         <p>Выполнено дней: ${habit.completedDates.length}</p>
                     </div>
                 </div>
@@ -462,6 +489,17 @@ function renderHabits() {
             </div>
         `;
     }).join('');
+}
+
+// Простая функция экранирования HTML
+function escapeHtml(unsafe) {
+    return unsafe.replace(/[&<>"]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        return m;
+    });
 }
 
 function updateStats() {
@@ -584,7 +622,7 @@ function renderNotes() {
                         <div class="note-date">${display}</div>
                         ${moodEmoji ? `<div class="note-mood">${moodEmoji}</div>` : ''}
                     </div>
-                    <div class="note-text">${preview}</div>
+                    <div class="note-text">${escapeHtml(preview)}</div>
                 </div>`;
     }).join('');
 
@@ -686,7 +724,7 @@ function deleteCurrentNote() {
     }
 }
 
-// ==================== ПРАКТИКИ (ОБНОВЛЕНО) ====================
+// ==================== ПРАКТИКИ ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -695,7 +733,8 @@ function setupPracticeTabs() {
             tabs.forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById(`${tab}-tab`)?.classList.add('active');
+            const tabContent = document.getElementById(`${tab}-tab`);
+            if (tabContent) tabContent.classList.add('active');
         });
     });
 }
@@ -765,7 +804,6 @@ function renderPracticeContent() {
         }
     ]; 
     
-
     const wTab = document.getElementById('workouts-tab');
     const mTab = document.getElementById('meditations-tab');
 
@@ -773,20 +811,20 @@ function renderPracticeContent() {
         wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
             <div class="video-card">
                 <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${escapeHtml(v.title)}" loading="lazy">
                     <span class="video-duration-badge">${v.duration}</span>
                 </div>
                 <div class="video-info">
-                    <h4 class="video-title">${v.title}</h4>
+                    <h4 class="video-title">${escapeHtml(v.title)}</h4>
                     <div class="video-meta">
                         <span class="video-channel">
                             <span class="channel-avatar">🏋️</span>
-                            ${v.channel}
+                            ${escapeHtml(v.channel)}
                         </span>
                         <span class="video-views">👁️ ${v.views}</span>
                     </div>
                     <div class="video-actions">
-                        <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">
+                        <button class="video-link" data-video-id="${v.videoId}" data-title="${escapeHtml(v.title)}">
                             <i class="fas fa-play"></i> Смотреть
                         </button>
                     </div>
@@ -807,20 +845,20 @@ function renderPracticeContent() {
         mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
             <div class="video-card">
                 <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${escapeHtml(v.title)}" loading="lazy">
                     <span class="video-duration-badge">${v.duration}</span>
                 </div>
                 <div class="video-info">
-                    <h4 class="video-title">${v.title}</h4>
+                    <h4 class="video-title">${escapeHtml(v.title)}</h4>
                     <div class="video-meta">
                         <span class="video-channel">
                             <span class="channel-avatar">🧘</span>
-                            ${v.channel}
+                            ${escapeHtml(v.channel)}
                         </span>
                         <span class="video-views">👁️ ${v.views}</span>
                     </div>
                     <div class="video-actions">
-                        <button class="video-link" data-video-id="${v.videoId}" data-title="${v.title}">
+                        <button class="video-link" data-video-id="${v.videoId}" data-title="${escapeHtml(v.title)}">
                             <i class="fas fa-play"></i> Смотреть
                         </button>
                     </div>
@@ -842,14 +880,14 @@ function renderPracticeContent() {
 function openVideoModal(title, videoId) {
     if (!elements.videoModal || !elements.videoPlayer) return;
     
-    elements.videoModalTitle.textContent = title;
+    if (elements.videoModalTitle) elements.videoModalTitle.textContent = title;
     
-    // Формируем embed URL с параметрами для нормальной работы без авторизации
     const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&rel=0&modestbranding=1`;
     elements.videoPlayer.src = embedUrl;
     
-    // Сохраняем URL для кнопки "Смотреть на YouTube"
-    elements.watchOnYoutubeBtn.dataset.url = `https://youtu.be/${videoId}`;
+    if (elements.watchOnYoutubeBtn) {
+        elements.watchOnYoutubeBtn.dataset.url = `https://youtu.be/${videoId}`;
+    }
     
     showModal('video-modal');
 }
@@ -863,10 +901,12 @@ function renderAccountStats() {
 
 // ==================== МОДАЛЬНЫЕ ОКНА ====================
 function showModal(modalId) {
-    document.getElementById(modalId)?.classList.add('active');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('active');
 }
 function hideModal(modalId) {
-    document.getElementById(modalId)?.classList.remove('active');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove('active');
     // Останавливаем видео при закрытии
     if (modalId === 'video-modal' && elements.videoPlayer) {
         elements.videoPlayer.src = '';
@@ -930,5 +970,3 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
-
-
