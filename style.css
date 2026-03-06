@@ -822,20 +822,18 @@ body {
     font-size: 16px;
 }
 
-/* ===== МОДАЛЬНОЕ ОКНО ВИДЕО ===== */
 /* ===== МОДАЛЬНОЕ ОКНО ВИДЕО (УЛУЧШЕННАЯ ВЕРСИЯ) ===== */
 #video-modal .modal-content {
-    max-width: 720px;        /* Ещё больше на широких экранах */
-    width: 95%;              /* Почти на всю ширину */
+    max-width: 720px;
+    width: 95%;
     background: var(--bg-card);
     border-radius: 28px;
     overflow: hidden;
     border: 1px solid var(--border);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Более глубокая тень */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     animation: modalZoom 0.3s ease-out;
 }
 
-/* Анимация появления */
 @keyframes modalZoom {
     from {
         opacity: 0;
@@ -910,7 +908,7 @@ body {
     padding: 20px;
     background: var(--bg-card);
     border-top: 1px solid var(--border-light);
-    justify-content: flex-end; /* Кнопки справа */
+    justify-content: flex-end;
 }
 
 #video-modal .btn {
@@ -953,7 +951,6 @@ body {
     opacity: 0.9;
 }
 
-/* Адаптация для маленьких экранов */
 @media (max-width: 480px) {
     #video-modal .modal-content {
         width: 100%;
@@ -1388,4 +1385,3 @@ input:checked + .slider:before {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
-
