@@ -1,8 +1,3 @@
-// =====================================================
-// MoodCraft — Telegram Mini App
-// Основной файл с логикой приложения (исправленная версия)
-// =====================================================
-
 // ==================== РАБОТА С TELEGRAM ====================
 const tg = window.Telegram?.WebApp;
 let tgUser = null;
@@ -970,3 +965,4 @@ function loadData() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
+
