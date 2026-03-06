@@ -23,7 +23,6 @@
     --radius-xl: 48px;
     --font-main: 'Inter', sans-serif;
 }
-
 /* ===== ТЁМНАЯ ТЕМА ===== */
 .dark-theme {
     --bg-primary: #121212;
@@ -1385,3 +1384,4 @@ input:checked + .slider:before {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
+
