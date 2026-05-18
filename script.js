@@ -487,7 +487,7 @@ function setupPracticeTabs() {
 // Данные тренировок и медитаций с VK Video (oid и vid)
 function renderPracticeContent() {
     const workouts = [
-        { title: '',
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут',
           duration: '40 мин', 
           vk_oid: '-203029839', 
           vk_vid: '456240609', 
@@ -529,7 +529,7 @@ function renderPracticeContent() {
           channel: 'Антонина Верьёмина', 
           views: '412 тыс.' },
 
-        { title: 'ТРАНСФОРМАЦИЯ_РУК_И_СПИНЫ', 
+        { title: 'ТРАНСФОРМАЦИЯ РУК И СПИНЫ', 
           duration: '40 мин', 
           vk_oid: '-237551639', 
           vk_vid: '456239083', 
