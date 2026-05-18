@@ -69,7 +69,6 @@ const elements = {
     noteMoodOptions: document.querySelectorAll('.mood-option'),
     noteDeleteBtn: document.getElementById('note-delete-btn'),
 
-    // Видео
     videoModal: document.getElementById('video-modal'),
     videoPlayer: document.getElementById('video-player'),
     videoModalTitle: document.getElementById('video-modal-title'),
@@ -101,39 +100,21 @@ function initApp() {
     console.log('initApp finished');
 }
 
-// ==================== ОБРАБОТКА ПАРАМЕТРА ЗАПУСКА ====================
 function handleStartParam() {
     const startParam = tg?.initDataUnsafe?.start_param;
     if (!startParam) return;
-
-    console.log('Start param:', startParam);
-
     switch (startParam) {
-        case 'today':
-        case 'start':
-        case 'home':
-            switchPage('home');
-            break;
-        case 'diary':
-            switchPage('diary');
-            break;
-        case 'add':
-            switchPage('home');
-            setTimeout(() => showModal('habit-modal'), 400);
-            break;
+        case 'today': case 'start': case 'home': switchPage('home'); break;
+        case 'diary': switchPage('diary'); break;
+        case 'add': switchPage('home'); setTimeout(() => showModal('habit-modal'), 400); break;
         case 'note':
             switchPage('diary');
             state.selectedDate = new Date();
             const todayNote = state.notes.find(n => isSameDay(new Date(n.date), new Date()));
-            if (todayNote) {
-                state.editingNoteId = todayNote.id;
-                setTimeout(() => openNoteModal(todayNote), 400);
-            } else {
-                setTimeout(() => openNoteModal(), 400);
-            }
+            if (todayNote) { state.editingNoteId = todayNote.id; setTimeout(() => openNoteModal(todayNote), 400); }
+            else { setTimeout(() => openNoteModal(), 400); }
             break;
-        default:
-            switchPage('home');
+        default: switchPage('home');
     }
 }
 
@@ -148,7 +129,6 @@ function setupGreeting() {
 }
 
 function setupEventListeners() {
-    // Переключение страниц
     elements.navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -157,8 +137,6 @@ function setupEventListeners() {
             btn.classList.add('active');
         });
     });
-
-    // Настроение
     elements.moodBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const mood = parseInt(btn.dataset.mood);
@@ -167,110 +145,47 @@ function setupEventListeners() {
             btn.classList.add('active');
         });
     });
-
-    // Добавление привычки
     if (elements.addHabitBtn) {
-        elements.addHabitBtn.addEventListener('click', () => {
-            showModal('habit-modal');
-            elements.habitInput?.focus();
-        });
+        elements.addHabitBtn.addEventListener('click', () => { showModal('habit-modal'); elements.habitInput?.focus(); });
     }
-
-    // Календарь
     if (elements.prevWeekBtn && elements.nextWeekBtn) {
-        elements.prevWeekBtn.addEventListener('click', () => {
-            state.currentWeek--;
-            renderCalendar();
-        });
-        elements.nextWeekBtn.addEventListener('click', () => {
-            state.currentWeek++;
-            renderCalendar();
-        });
+        elements.prevWeekBtn.addEventListener('click', () => { state.currentWeek--; renderCalendar(); });
+        elements.nextWeekBtn.addEventListener('click', () => { state.currentWeek++; renderCalendar(); });
     }
-
-    // Поиск заметок
-    if (elements.searchNotes) {
-        elements.searchNotes.addEventListener('input', renderNotes);
-    }
-
-    // Модалки
+    if (elements.searchNotes) elements.searchNotes.addEventListener('input', renderNotes);
     setupModalControls();
-
-    // Вкладки практик
     setupPracticeTabs();
-
-    // Тема
     if (elements.themeToggle) {
-        elements.themeToggle.addEventListener('change', (e) => {
-            state.darkTheme = e.target.checked;
-            applyTheme(state.darkTheme);
-            saveData();
-        });
+        elements.themeToggle.addEventListener('change', (e) => { state.darkTheme = e.target.checked; applyTheme(state.darkTheme); saveData(); });
     }
-
-    // Скрытие клавиатуры
     document.addEventListener('click', function(e) {
         const searchInput = elements.searchNotes;
-        if (searchInput && !searchInput.contains(e.target)) {
-            searchInput.blur();
-        }
+        if (searchInput && !searchInput.contains(e.target)) searchInput.blur();
     });
 }
 
 function setupModalControls() {
-    // Закрытие модалки привычки
     document.querySelectorAll('#habit-modal .close-btn, #cancel-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            hideModal('habit-modal');
-            if (elements.habitInput) elements.habitInput.value = '';
-            if (elements.habitDesc) elements.habitDesc.value = '';
-        });
+        btn.addEventListener('click', () => { hideModal('habit-modal'); if (elements.habitInput) elements.habitInput.value = ''; if (elements.habitDesc) elements.habitDesc.value = ''; });
     });
     document.getElementById('save-btn')?.addEventListener('click', saveHabit);
-    elements.habitInput?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') saveHabit();
-    });
-
-    // Закрытие модалки заметки
+    elements.habitInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveHabit(); });
     document.querySelectorAll('#note-modal .close-btn, #note-cancel-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            hideModal('note-modal');
-            if (elements.noteInput) elements.noteInput.value = '';
-            state.editingNoteId = null;
-        });
+        btn.addEventListener('click', () => { hideModal('note-modal'); if (elements.noteInput) elements.noteInput.value = ''; state.editingNoteId = null; });
     });
     document.getElementById('note-save-btn')?.addEventListener('click', saveNote);
-    if (elements.noteDeleteBtn) {
-        elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
-    }
+    if (elements.noteDeleteBtn) elements.noteDeleteBtn.addEventListener('click', deleteCurrentNote);
     if (elements.noteInput) {
-        elements.noteInput.addEventListener('input', (e) => {
-            if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`;
-        });
+        elements.noteInput.addEventListener('input', (e) => { if (elements.charCount) elements.charCount.textContent = `${e.target.value.length}/1000`; });
     }
-
-    // Выбор настроения в заметке
     elements.noteMoodOptions.forEach(btn => {
-        btn.addEventListener('click', () => {
-            elements.noteMoodOptions.forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        });
+        btn.addEventListener('click', () => { elements.noteMoodOptions.forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); });
     });
-
-    // Закрытие модалок по клику на фон
     document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) hideModal(modal.id);
-        });
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(modal.id); });
     });
-
-    // ----- Видео-модалка -----
-    if (elements.closeVideoModalBtn) {
-        elements.closeVideoModalBtn.addEventListener('click', () => hideModal('video-modal'));
-    }
-    if (elements.closeVideoBtn) {
-        elements.closeVideoBtn.addEventListener('click', () => hideModal('video-modal'));
-    }
+    if (elements.closeVideoModalBtn) elements.closeVideoModalBtn.addEventListener('click', () => hideModal('video-modal'));
+    if (elements.closeVideoBtn) elements.closeVideoBtn.addEventListener('click', () => hideModal('video-modal'));
     if (elements.watchOnYoutubeBtn) {
         elements.watchOnYoutubeBtn.addEventListener('click', () => {
             const url = elements.watchOnYoutubeBtn.dataset.url;
@@ -280,22 +195,9 @@ function setupModalControls() {
 }
 
 function switchPage(page) {
-    console.log('switchPage', page);
     state.currentPage = page;
-
-    const sections = [
-        elements.welcomeCard,
-        elements.moodSection,
-        elements.habitsSection,
-        elements.diarySection,
-        elements.statsSection,
-        elements.practiceSection,
-        elements.accountSection
-    ];
-    sections.forEach(el => {
-        if (el) el.classList.add('hidden');
-    });
-
+    const sections = [elements.welcomeCard, elements.moodSection, elements.habitsSection, elements.diarySection, elements.statsSection, elements.practiceSection, elements.accountSection];
+    sections.forEach(el => { if (el) el.classList.add('hidden'); });
     if (page === 'home') {
         if (elements.welcomeCard) elements.welcomeCard.classList.remove('hidden');
         if (elements.moodSection) elements.moodSection.classList.remove('hidden');
@@ -314,73 +216,42 @@ function switchPage(page) {
 }
 
 function applyTheme(isDark) {
-    if (isDark) {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
-    }
-    if (elements.themeToggle) {
-        elements.themeToggle.checked = isDark;
-    }
+    if (isDark) document.body.classList.add('dark-theme');
+    else document.body.classList.remove('dark-theme');
+    if (elements.themeToggle) elements.themeToggle.checked = isDark;
 }
 
-// ==================== НАСТРОЕНИЕ ====================
 function setMood(mood) {
     state.currentMood = mood;
     saveData();
-
     const moodNames = ['', 'Плохо', 'Не очень', 'Хорошо', 'Отлично!'];
     showToast(moodNames[mood]);
 }
 
-// ==================== ПРИВЫЧКИ ====================
-function getTodayString() {
-    return new Date().toISOString().split('T')[0];
-}
+function getTodayString() { return new Date().toISOString().split('T')[0]; }
 
 function migrateHabits(habits) {
     return habits.map(habit => {
-        // Убедимся, что completedDates — массив
         let completedDates = habit.completedDates;
         if (!Array.isArray(completedDates)) {
-            // Если это старое поле completed, преобразуем
-            if (habit.completed) {
-                completedDates = [getTodayString()];
-            } else {
-                completedDates = [];
-            }
+            if (habit.completed) completedDates = [getTodayString()];
+            else completedDates = [];
         }
-        return {
-            ...habit,
-            completedDates,
-            description: habit.description || ''
-        };
+        return { ...habit, completedDates, description: habit.description || '' };
     });
 }
 
 function calculateOverallStreak() {
     const activeDays = new Set();
-    state.habits.forEach(habit => {
-        habit.completedDates.forEach(date => activeDays.add(date));
-    });
-
-    if (activeDays.size === 0) {
-        state.streak = 0;
-        return;
-    }
-
+    state.habits.forEach(habit => { habit.completedDates.forEach(date => activeDays.add(date)); });
+    if (activeDays.size === 0) { state.streak = 0; return; }
     const sorted = Array.from(activeDays).sort();
     let current = 1, max = 1;
     for (let i = 1; i < sorted.length; i++) {
-        const prev = new Date(sorted[i - 1]);
-        const curr = new Date(sorted[i]);
-        const diff = (curr - prev) / (1000 * 3600 * 24);
-        if (diff === 1) {
-            current++;
-            max = Math.max(max, current);
-        } else {
-            current = 1;
-        }
+        const prev = new Date(sorted[i-1]), curr = new Date(sorted[i]);
+        const diff = (curr - prev) / (1000*3600*24);
+        if (diff === 1) { current++; max = Math.max(max, current); }
+        else { current = 1; }
     }
     state.streak = max;
 }
@@ -395,11 +266,8 @@ function toggleHabit(id) {
     if (!habit) return;
     const today = getTodayString();
     const idx = habit.completedDates.indexOf(today);
-    if (idx === -1) {
-        habit.completedDates.push(today);
-    } else {
-        habit.completedDates.splice(idx, 1);
-    }
+    if (idx === -1) habit.completedDates.push(today);
+    else habit.completedDates.splice(idx, 1);
     calculateOverallStreak();
     saveData();
     render();
@@ -418,18 +286,9 @@ function deleteHabit(id) {
 
 function saveHabit() {
     const title = elements.habitInput?.value.trim();
-    if (!title) {
-        showToast('Введите название привычки');
-        return;
-    }
+    if (!title) { showToast('Введите название привычки'); return; }
     const description = elements.habitDesc?.value.trim() || '';
-    const newHabit = {
-        id: Date.now(),
-        title,
-        description,
-        completedDates: [],
-        createdAt: new Date().toISOString()
-    };
+    const newHabit = { id: Date.now(), title, description, completedDates: [], createdAt: new Date().toISOString() };
     state.habits.push(newHabit);
     hideModal('habit-modal');
     if (elements.habitInput) elements.habitInput.value = '';
@@ -439,27 +298,17 @@ function saveHabit() {
     showToast('Привычка добавлена');
 }
 
-// ==================== ОТРИСОВКА ГЛАВНОЙ ====================
-function render() {
-    renderHabits();
-    updateStats();
-}
+function render() { renderHabits(); updateStats(); }
 
 function renderHabits() {
     if (!elements.habitsList || !elements.habitsCounter) return;
     if (state.habits.length === 0) {
-        elements.habitsList.innerHTML = `
-            <div class="empty-state">
-                <div class="emoji">🎯</div>
-                <p>Добавьте первую привычку</p>
-            </div>
-        `;
+        elements.habitsList.innerHTML = `<div class="empty-state"><div class="emoji">🎯</div><p>Добавьте первую привычку</p></div>`;
         return;
     }
     const completedToday = getCompletedTodayCount();
     const total = state.habits.length;
     elements.habitsCounter.textContent = `${completedToday}/${total}`;
-
     elements.habitsList.innerHTML = state.habits.map(habit => {
         const completed = habit.completedDates.includes(getTodayString());
         return `
@@ -473,20 +322,14 @@ function renderHabits() {
                     </div>
                 </div>
                 <div class="habit-actions">
-                    <button class="habit-delete" onclick="deleteHabit(${habit.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="habit-check ${completed ? 'checked' : ''}" 
-                            onclick="toggleHabit(${habit.id})">
-                        <i class="fas fa-check"></i>
-                    </button>
+                    <button class="habit-delete" onclick="deleteHabit(${habit.id})"><i class="fas fa-trash"></i></button>
+                    <button class="habit-check ${completed ? 'checked' : ''}" onclick="toggleHabit(${habit.id})"><i class="fas fa-check"></i></button>
                 </div>
             </div>
         `;
     }).join('');
 }
 
-// Простая функция экранирования HTML
 function escapeHtml(unsafe) {
     return unsafe.replace(/[&<>"]/g, function(m) {
         if (m === '&') return '&amp;';
@@ -506,71 +349,38 @@ function updateStats() {
     if (elements.statTotal) elements.statTotal.textContent = total;
 }
 
-// ==================== КАЛЕНДАРЬ ====================
 function renderCalendar() {
     if (!elements.weekDates) return;
     const today = new Date();
     const currentDate = new Date();
     currentDate.setDate(today.getDate() + (state.currentWeek * 7));
-    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    if (elements.monthTitle) {
-        elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-    }
-
-    // Находим понедельник этой недели
+    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    if (elements.monthTitle) elements.monthTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     const monday = new Date(currentDate);
-    const day = monday.getDay(); // 0 = воскресенье, 1 = понедельник, ...
+    const day = monday.getDay();
     const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
     monday.setDate(diff);
-
     elements.weekDates.innerHTML = '';
     const weekDays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
-
     for (let i = 0; i < 7; i++) {
         const date = new Date(monday);
         date.setDate(monday.getDate() + i);
         const btn = document.createElement('button');
         btn.className = 'date-btn';
-        btn.innerHTML = `
-            <div>${date.getDate()}</div>
-            <div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>
-        `;
-
-        // Отмечаем сегодняшний день
+        btn.innerHTML = `<div>${date.getDate()}</div><div style="font-size: 10px; margin-top: 2px; opacity: 0.7">${weekDays[i]}</div>`;
         if (isSameDay(date, today)) btn.classList.add('today');
-
-        // Отмечаем выбранный день
         if (state.selectedDate && isSameDay(date, state.selectedDate)) btn.classList.add('selected');
-
-        // Отмечаем дни с заметками
-        const hasNote = state.notes.some(note => {
-            try { return isSameDay(new Date(note.date), date); } catch { return false; }
-        });
+        const hasNote = state.notes.some(note => { try { return isSameDay(new Date(note.date), date); } catch { return false; } });
         if (hasNote) btn.classList.add('has-note');
-
-        // Дни из другого месяца
         if (date.getMonth() !== currentDate.getMonth()) btn.classList.add('other-month');
-
-        // Выделяем выходные
         if (i === 5 || i === 6) btn.classList.add('weekend-number');
-
         const dateCopy = new Date(date);
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (dateCopy > new Date()) {
-                showToast('Заметки заранее недоступны');
-                return;
-            }
+            if (dateCopy > new Date()) { showToast('Заметки заранее недоступны'); return; }
             const existingNote = state.notes.find(n => isSameDay(new Date(n.date), dateCopy));
-            if (existingNote) {
-                state.editingNoteId = existingNote.id;
-                state.selectedDate = dateCopy;
-                openNoteModal(existingNote);
-            } else {
-                state.selectedDate = dateCopy;
-                openNoteModal();
-            }
+            if (existingNote) { state.editingNoteId = existingNote.id; state.selectedDate = dateCopy; openNoteModal(existingNote); }
+            else { state.selectedDate = dateCopy; openNoteModal(); }
         });
         elements.weekDates.appendChild(btn);
     }
@@ -578,31 +388,18 @@ function renderCalendar() {
 
 function isSameDay(date1, date2) {
     if (!date1 || !date2) return false;
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+    return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
 }
 
-// ==================== ЗАМЕТКИ ====================
 function renderNotes() {
     if (!elements.notesList) return;
     const query = elements.searchNotes?.value.toLowerCase() || '';
-    let filtered = state.notes.filter(n => n.text.toLowerCase().includes(query))
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
-
+    let filtered = state.notes.filter(n => n.text.toLowerCase().includes(query)).sort((a,b) => new Date(b.date) - new Date(a.date));
     if (filtered.length === 0) {
         elements.notesList.innerHTML = `<div class="empty-state"><div class="emoji">📝</div><p>${query ? 'Заметки не найдены' : 'Пока нет заметок'}</p></div>`;
         return;
     }
-
-    const moodEmojis = [
-        '', 
-        '<img src="images/badly.png" class="note-mood-img" alt="Плохо">',
-        '<img src="images/not_good.png" class="note-mood-img" alt="Не очень">',
-        '<img src="images/good.png" class="note-mood-img" alt="Хорошо">',
-        '<img src="images/great.png" class="note-mood-img" alt="Отлично!">'
-    ];
-
+    const moodEmojis = ['', '<img src="images/badly.png" class="note-mood-img" alt="Плохо">', '<img src="images/not_good.png" class="note-mood-img" alt="Не очень">', '<img src="images/good.png" class="note-mood-img" alt="Хорошо">', '<img src="images/great.png" class="note-mood-img" alt="Отлично!">'];
     elements.notesList.innerHTML = filtered.map(note => {
         const date = new Date(note.date);
         const today = new Date(), yesterday = new Date(today);
@@ -610,88 +407,46 @@ function renderNotes() {
         let display = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
         if (isSameDay(date, today)) display = 'Сегодня';
         else if (isSameDay(date, yesterday)) display = 'Вчера';
-        const preview = note.text.length > 100 ? note.text.slice(0, 100) + '…' : note.text;
+        const preview = note.text.length > 100 ? note.text.slice(0,100)+'…' : note.text;
         const moodEmoji = note.mood ? moodEmojis[note.mood] : '';
-        return `<div class="note-card" data-id="${note.id}">
-                    <div class="note-header">
-                        <div class="note-date">${display}</div>
-                        ${moodEmoji ? `<div class="note-mood">${moodEmoji}</div>` : ''}
-                    </div>
-                    <div class="note-text">${escapeHtml(preview)}</div>
-                </div>`;
+        return `<div class="note-card" data-id="${note.id}"><div class="note-header"><div class="note-date">${display}</div>${moodEmoji ? `<div class="note-mood">${moodEmoji}</div>` : ''}</div><div class="note-text">${escapeHtml(preview)}</div></div>`;
     }).join('');
-
     document.querySelectorAll('.note-card').forEach(card => {
-        card.addEventListener('click', function () {
+        card.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
             const note = state.notes.find(n => n.id === id);
-            if (note) {
-                state.editingNoteId = id;
-                state.selectedDate = new Date(note.date);
-                openNoteModal(note);
-            }
+            if (note) { state.editingNoteId = id; state.selectedDate = new Date(note.date); openNoteModal(note); }
         });
     });
 }
 
 function openNoteModal(note = null) {
-    if (!note && state.selectedDate > new Date()) {
-        showToast('Заметки заранее недоступны');
-        return;
-    }
-
+    if (!note && state.selectedDate > new Date()) { showToast('Заметки заранее недоступны'); return; }
     if (elements.noteInput) elements.noteInput.value = note ? note.text : '';
     if (elements.charCount) elements.charCount.textContent = `${elements.noteInput?.value.length || 0}/1000`;
-
     const title = document.getElementById('note-title');
     if (title) title.textContent = note ? 'Редактировать заметку' : 'Новая заметка';
-
     const moodToSelect = note ? note.mood : state.currentMood;
     elements.noteMoodOptions.forEach(btn => {
         const moodVal = parseInt(btn.dataset.mood);
-        if (moodVal === moodToSelect) {
-            btn.classList.add('selected');
-        } else {
-            btn.classList.remove('selected');
-        }
+        if (moodVal === moodToSelect) btn.classList.add('selected');
+        else btn.classList.remove('selected');
     });
-
     showModal('note-modal');
     elements.noteInput?.focus();
 }
 
 function saveNote() {
     const text = elements.noteInput?.value.trim();
-    if (!text) {
-        showToast('Введите текст заметки');
-        return;
-    }
-
+    if (!text) { showToast('Введите текст заметки'); return; }
     let selectedMood = null;
-    elements.noteMoodOptions.forEach(btn => {
-        if (btn.classList.contains('selected')) {
-            selectedMood = parseInt(btn.dataset.mood);
-        }
-    });
-
+    elements.noteMoodOptions.forEach(btn => { if (btn.classList.contains('selected')) selectedMood = parseInt(btn.dataset.mood); });
     if (state.editingNoteId) {
         const idx = state.notes.findIndex(n => n.id === state.editingNoteId);
-        if (idx !== -1) {
-            state.notes[idx].text = text;
-            state.notes[idx].mood = selectedMood;
-            state.notes[idx].updatedAt = new Date().toISOString();
-        }
+        if (idx !== -1) { state.notes[idx].text = text; state.notes[idx].mood = selectedMood; state.notes[idx].updatedAt = new Date().toISOString(); }
     } else {
-        state.notes.push({
-            id: Date.now(),
-            date: state.selectedDate.toISOString(),
-            text,
-            mood: selectedMood,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
+        state.notes.push({ id: Date.now(), date: state.selectedDate.toISOString(), text, mood: selectedMood, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
     }
-
     hideModal('note-modal');
     if (elements.noteInput) elements.noteInput.value = '';
     state.editingNoteId = null;
@@ -702,11 +457,7 @@ function saveNote() {
 }
 
 function deleteCurrentNote() {
-    if (!state.editingNoteId) {
-        hideModal('note-modal');
-        return;
-    }
-
+    if (!state.editingNoteId) { hideModal('note-modal'); return; }
     if (confirm('Удалить эту заметку?')) {
         state.notes = state.notes.filter(n => n.id !== state.editingNoteId);
         state.editingNoteId = null;
@@ -719,7 +470,6 @@ function deleteCurrentNote() {
     }
 }
 
-// ==================== ПРАКТИКИ ====================
 function setupPracticeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -734,71 +484,28 @@ function setupPracticeTabs() {
     });
 }
 
+// Данные тренировок и медитаций с VK Video (oid и vid)
 function renderPracticeContent() {
-   const workouts = [
-        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело', duration: '40 мин', videoId: 'ujkE3ZOcTrQ', channel: 'Татьяна Метельская', views: '456 тыс.' },
-        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут | Упражнения На Всё тело (2)', duration: '40 мин', videoId: 'E16zGKdeMz4', channel: 'Татьяна Метельская', views: '389 тыс.' },
-        { title: 'ШАГИ ДЛЯ ПОХУДЕНИЯ под Русскоязычные Хиты 2000-х! | Пройди 5000 ШАГОВ ДОМА', duration: '30 мин', videoId: '32xCCheCMtQ', channel: 'Татьяна Метельская', views: '178 тыс.' },
-        { title: 'Танцевальная Зарядка за 10 минут под Хиты 2000-х!', duration: '10 мин', videoId: 'jzuULVNrWhE', channel: 'Татьяна Метельская', views: '250 тыс.' },
-        { title: 'КРУГОВАЯ Тренировка на Все Тело с ГАНТЕЛЯМИ за 45 Минут | Жиросжигатель', duration: '45 мин', videoId: 'F3a9Lxay_sc', channel: 'Татьяна Метельская', views: '192 тыс.' },
-        { title: 'Шаговая Тренировка за 15 минут под Рок Хиты! | ШАГАЙ ДОМА и ХУДЕЙ', duration: '15 мин', videoId: 'v4JvhFGh5Kw', channel: 'Татьяна Метельская', views: '310 тыс.' },
-        { title: 'Тренировка на Всё Тело БЕЗ ПОВТОРОВ с Гантелями за 15 минут Дома', duration: '15 мин', videoId: 'h1WpYiXVS6s', channel: 'Татьяна Метельская', views: '167 тыс.' },
-        { title: 'Утренняя Зарядка СТОЯ за 5 минут | Суставная Разминка на Всё Тело', duration: '5 мин', videoId: 'zFOG16nn-iY', channel: 'Татьяна Метельская', views: '412 тыс.' },
-        { title: 'Пилатес для Плоского Живота за 10 минут | Спокойная Тренировка на ПРЕСС', duration: '10 мин', videoId: 'aOzIPZ1aPRo', channel: 'Татьяна Метельская', views: '288 тыс.' },
-        { title: 'Жиросжигающая Тренировка ТАБАТА на ВСЁ ТЕЛО за 30 минут | Убери Живот Быстро!', duration: '30 мин', videoId: 'u0drnTv2v6c', channel: 'Татьяна Метельская', views: '345 тыс.' }
+    const workouts = [
+        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут', duration: '40 мин', vk_oid: '-212291370', vk_vid: '456239017', channel: 'Фитнес Дома', views: '456 тыс.' },
+        { title: 'ШАГИ ДЛЯ ПОХУДЕНИЯ под Русскоязычные Хиты 2000-х', duration: '30 мин', vk_oid: '-212291370', vk_vid: '456239018', channel: 'Фитнес Дома', views: '178 тыс.' },
+        { title: 'Танцевальная Зарядка за 10 минут под Хиты 2000-х', duration: '10 мин', vk_oid: '-212291370', vk_vid: '456239019', channel: 'Фитнес Дома', views: '250 тыс.' },
+        { title: 'КРУГОВАЯ Тренировка на Все Тело за 45 минут', duration: '45 мин', vk_oid: '-212291370', vk_vid: '456239020', channel: 'Фитнес Дома', views: '192 тыс.' },
+        { title: 'Шаговая Тренировка за 15 минут под Рок Хиты', duration: '15 мин', vk_oid: '-212291370', vk_vid: '456239021', channel: 'Фитнес Дома', views: '310 тыс.' },
+        { title: 'Утренняя Зарядка СТОЯ за 5 минут', duration: '5 мин', vk_oid: '-212291370', vk_vid: '456239022', channel: 'Фитнес Дома', views: '412 тыс.' },
+        { title: 'Пилатес для Плоского Живота за 10 минут', duration: '10 мин', vk_oid: '-212291370', vk_vid: '456239023', channel: 'Фитнес Дома', views: '288 тыс.' },
+        { title: 'Жиросжигающая Тренировка ТАБАТА за 30 минут', duration: '30 мин', vk_oid: '-212291370', vk_vid: '456239024', channel: 'Фитнес Дома', views: '345 тыс.' }
     ];
     const meditations = [
-        { 
-            title: 'Средневековый костер у озера | Расслабляющая фэнтези музыка', 
-            duration: '60 мин', 
-            videoId: 'i-TOWDm0h2U', 
-            channel: 'Elder Melodies', 
-            views: '758 тыс.' 
-        },
-        { 
-            title: 'Долина тихого сердца | Фэнтези кельтская атмосфера', 
-            duration: '60 мин', 
-            videoId: 'aIMhtT52fi8', 
-            channel: 'Strings of Eternity', 
-            views: '687 тыс.' 
-        },
-        { 
-            title: 'Средневековая музыка для концентрации и спокойствия | Уютный зимний костер в Шире', 
-            duration: '60 мин', 
-            videoId: 'sDJO0EQP1Yo', 
-            channel: '舒适的港湾', 
-            views: '299 тыс.' 
-        },
-        { 
-            title: 'Средневековая и фэнтези музыка для глубокого расслабления', 
-            duration: '60 мин', 
-            videoId: '5QrlLqaLEs8', 
-            channel: 'Jai Melodies', 
-            views: '456 тыс.' 
-        },
-        { 
-            title: 'Фэнтези музыка для учебы и отдыха', 
-            duration: '60 мин', 
-            videoId: 'm2epskibmdA', 
-            channel: 'Fantasy Music', 
-            views: '892 тыс.' 
-        },
-        { 
-            title: 'Расслабляющая фэнтези музыка для глубокого сна', 
-            duration: '60 мин', 
-            videoId: '_QqabGYTSpQ', 
-            channel: 'Meditation Vibes', 
-            views: '523 тыс.' 
-        },
-        { 
-            title: 'Спокойная средневековая музыка для релаксации', 
-            duration: '60 мин', 
-            videoId: 'dztKn5ZZRN4', 
-            channel: 'Celtic Moods', 
-            views: '341 тыс.' 
-        }
-    ]; 
-    
+        { title: 'Средневековый костер у озера | Расслабляющая музыка', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239025', channel: 'Медитации VK', views: '758 тыс.' },
+        { title: 'Долина тихого сердца | Фэнтези кельтская атмосфера', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239026', channel: 'Медитации VK', views: '687 тыс.' },
+        { title: 'Средневековая музыка для концентрации', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239027', channel: 'Медитации VK', views: '299 тыс.' },
+        { title: 'Музыка для глубокого расслабления', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239028', channel: 'Медитации VK', views: '456 тыс.' },
+        { title: 'Фэнтези музыка для учебы и отдыха', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239029', channel: 'Медитации VK', views: '892 тыс.' },
+        { title: 'Расслабляющая музыка для глубокого сна', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239030', channel: 'Медитации VK', views: '523 тыс.' },
+        { title: 'Спокойная средневековая музыка для релаксации', duration: '60 мин', vk_oid: '-148353091', vk_vid: '456239031', channel: 'Медитации VK', views: '341 тыс.' }
+    ];
+
     const wTab = document.getElementById('workouts-tab');
     const mTab = document.getElementById('meditations-tab');
 
@@ -806,32 +513,29 @@ function renderPracticeContent() {
         wTab.innerHTML = `<div class="videos-grid">${workouts.map(v => `
             <div class="video-card">
                 <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${escapeHtml(v.title)}" loading="lazy">
+                    <img src="https://sun9-28.userapi.com/impf/c857220/v857220015/1f1b1d/placeholder.jpg?size=640x360&quality=96&proxy=1" alt="${escapeHtml(v.title)}" loading="lazy">
                     <span class="video-duration-badge">${v.duration}</span>
                 </div>
                 <div class="video-info">
                     <h4 class="video-title">${escapeHtml(v.title)}</h4>
                     <div class="video-meta">
-                        <span class="video-channel">
-                            <span class="channel-avatar">🏋️</span>
-                            ${escapeHtml(v.channel)}
-                        </span>
+                        <span class="video-channel"><span class="channel-avatar">🏋️</span>${escapeHtml(v.channel)}</span>
                         <span class="video-views">👁️ ${v.views}</span>
                     </div>
                     <div class="video-actions">
-                        <button class="video-link" data-video-id="${v.videoId}" data-title="${escapeHtml(v.title)}">
+                        <button class="video-link" data-vk-oid="${v.vk_oid}" data-vk-vid="${v.vk_vid}" data-title="${escapeHtml(v.title)}">
                             <i class="fas fa-play"></i> Смотреть
                         </button>
                     </div>
                 </div>
             </div>`).join('')}</div>`;
-
         wTab.querySelectorAll('.video-link').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const videoId = btn.dataset.videoId;
+                const oid = btn.dataset.vkOid;
+                const vid = btn.dataset.vkVid;
                 const title = btn.dataset.title;
-                openVideoModal(title, videoId);
+                openVideoModal(title, oid, vid);
             });
         });
     }
@@ -840,99 +544,69 @@ function renderPracticeContent() {
         mTab.innerHTML = `<div class="videos-grid">${meditations.map(v => `
             <div class="video-card">
                 <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg" alt="${escapeHtml(v.title)}" loading="lazy">
+                    <img src="https://sun9-28.userapi.com/impf/c857220/v857220015/1f1b1d/placeholder.jpg?size=640x360&quality=96&proxy=1" alt="${escapeHtml(v.title)}" loading="lazy">
                     <span class="video-duration-badge">${v.duration}</span>
                 </div>
                 <div class="video-info">
                     <h4 class="video-title">${escapeHtml(v.title)}</h4>
                     <div class="video-meta">
-                        <span class="video-channel">
-                            <span class="channel-avatar">🧘</span>
-                            ${escapeHtml(v.channel)}
-                        </span>
+                        <span class="video-channel"><span class="channel-avatar">🧘</span>${escapeHtml(v.channel)}</span>
                         <span class="video-views">👁️ ${v.views}</span>
                     </div>
                     <div class="video-actions">
-                        <button class="video-link" data-video-id="${v.videoId}" data-title="${escapeHtml(v.title)}">
+                        <button class="video-link" data-vk-oid="${v.vk_oid}" data-vk-vid="${v.vk_vid}" data-title="${escapeHtml(v.title)}">
                             <i class="fas fa-play"></i> Смотреть
                         </button>
                     </div>
                 </div>
             </div>`).join('')}</div>`;
-
         mTab.querySelectorAll('.video-link').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const videoId = btn.dataset.videoId;
+                const oid = btn.dataset.vkOid;
+                const vid = btn.dataset.vkVid;
                 const title = btn.dataset.title;
-                openVideoModal(title, videoId);
+                openVideoModal(title, oid, vid);
             });
         });
     }
 }
 
-// ==================== ВИДЕО ПЛЕЕР ====================
-function openVideoModal(title, videoId) {
+// Открытие VK Video плеера
+function openVideoModal(title, vkOid, vkVid) {
     if (!elements.videoModal || !elements.videoPlayer) return;
-    
     if (elements.videoModalTitle) elements.videoModalTitle.textContent = title;
-    
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&rel=0&modestbranding=1`;
+    const embedUrl = `https://vk.com/video_ext.php?oid=${vkOid}&id=${vkVid}&autoplay=1&hd=1`;
     elements.videoPlayer.src = embedUrl;
-    
     if (elements.watchOnYoutubeBtn) {
-        elements.watchOnYoutubeBtn.dataset.url = `https://youtu.be/${videoId}`;
+        elements.watchOnYoutubeBtn.dataset.url = `https://vk.com/video${vkOid}_${vkVid}`;
     }
-    
     showModal('video-modal');
 }
 
-// ==================== АККАУНТ ====================
 function renderAccountStats() {
     if (elements.accountStatStreak) elements.accountStatStreak.textContent = state.streak;
     if (elements.accountStatHabits) elements.accountStatHabits.textContent = state.habits.length;
     if (elements.accountStatNotes) elements.accountStatNotes.textContent = state.notes.length;
 }
 
-// ==================== МОДАЛЬНЫЕ ОКНА ====================
-function showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('active');
-}
-function hideModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.classList.remove('active');
-    // Останавливаем видео при закрытии
-    if (modalId === 'video-modal' && elements.videoPlayer) {
-        elements.videoPlayer.src = '';
-    }
+function showModal(modalId) { const modal = document.getElementById(modalId); if (modal) modal.classList.add('active'); }
+function hideModal(modalId) { 
+    const modal = document.getElementById(modalId); 
+    if (modal) modal.classList.remove('active'); 
+    if (modalId === 'video-modal' && elements.videoPlayer) elements.videoPlayer.src = ''; 
 }
 
-// ==================== TOAST ====================
 function showToast(message) {
     const toast = document.createElement('div');
     toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-        background: var(--text-primary); color: var(--bg-primary);
-        padding: 12px 24px; border-radius: 40px; font-size: 14px;
-        z-index: 1000; animation: fadeInOut 2s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    `;
+    toast.style.cssText = `position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-primary); padding: 12px 24px; border-radius: 40px; font-size: 14px; z-index: 1000; animation: fadeInOut 2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.2);`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
 }
 
-// ==================== СОХРАНЕНИЕ И ЗАГРУЗКА ====================
 function saveData() {
-    const data = {
-        habits: state.habits,
-        notes: state.notes,
-        currentMood: state.currentMood,
-        streak: state.streak,
-        darkTheme: state.darkTheme,
-        lastSave: new Date().toISOString()
-    };
+    const data = { habits: state.habits, notes: state.notes, currentMood: state.currentMood, streak: state.streak, darkTheme: state.darkTheme, lastSave: new Date().toISOString() };
     localStorage.setItem('moodcraft', JSON.stringify(data));
 }
 
@@ -946,23 +620,13 @@ function loadData() {
             state.currentMood = data.currentMood || null;
             state.streak = data.streak || 0;
             state.darkTheme = data.darkTheme || false;
-
             calculateOverallStreak();
-
             if (state.currentMood) {
-                elements.moodBtns.forEach(btn => {
-                    if (parseInt(btn.dataset.mood) === state.currentMood) {
-                        btn.classList.add('active');
-                    }
-                });
+                elements.moodBtns.forEach(btn => { if (parseInt(btn.dataset.mood) === state.currentMood) btn.classList.add('active'); });
             }
-        } catch (e) {
-            console.error('Ошибка загрузки данных', e);
-        }
+        } catch(e) { console.error('Ошибка загрузки данных', e); }
     }
 }
 
-// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.toggleHabit = toggleHabit;
 window.deleteHabit = deleteHabit;
-
