@@ -487,7 +487,7 @@ function setupPracticeTabs() {
 // Данные тренировок и медитаций с VK Video (oid и vid)
 function renderPracticeContent() {
     const workouts = [
-        { title: 'Тренировка БЕЗ ПОВТОРОВ с ГАНТЕЛЯМИ за 40 минут',
+        { title: '',
           duration: '40 мин', 
           vk_oid: '-203029839', 
           vk_vid: '456240609', 
